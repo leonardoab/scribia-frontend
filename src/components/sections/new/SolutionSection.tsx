@@ -1,7 +1,5 @@
 import { Lightbulb } from "lucide-react";
-
-// Asset remoto do diagrama do ecossistema
-const ecosystemDiagram = "https://raw.githubusercontent.com/Seibert2808/scribia-73649/main/src/assets/images/ecosystem-diagram.svg";
+import ecosystemDiagram from "@/assets/images/ecosystem-diagram-home.png";
 
 const SolutionSection = () => {
   return (

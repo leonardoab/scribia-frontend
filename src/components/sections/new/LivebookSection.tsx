@@ -1,8 +1,6 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Asset remoto para evitar copiar arquivo binário
-const livebookImage = "https://raw.githubusercontent.com/Seibert2808/scribia-73649/main/src/assets/images/livebook-professional.png";
+import livebookImage from "@/assets/images/livebook-tablet-home.png";
 
 const LivebookSection = () => {
   const handleScrollToPlans = () => {

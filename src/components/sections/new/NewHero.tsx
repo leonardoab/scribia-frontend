@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Play, Info, Users, Calendar, Mic, Handshake, ArrowRight, Megaphone } from "lucide-react";
 import logoImage from "@/assets/images/hero-scribia-new.png";
+import heroBackground from "@/assets/images/hero-background-home.png";
 import { Link } from "react-router-dom";
 
-// Usando assets remotos para evitar copiar arquivos binários
-const heroBackground = "https://raw.githubusercontent.com/Seibert2808/scribia-73649/main/src/assets/images/hero-background.svg";
 const scribiaIcon = "/lovable-uploads/scribia-logo-new.png";
 
 const NewHero = () => {
