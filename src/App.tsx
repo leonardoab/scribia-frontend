@@ -129,6 +129,12 @@ const App = () => (
                       <PalestrantesLanding />
                     </>
                   } />
+                  <Route path="/influenciadores" element={
+                    <>
+                      <Navbar />
+                      <PalestrantesLanding />
+                    </>
+                  } />
                   <Route path="/patrocinadores" element={
                     <>
                       <Navbar />

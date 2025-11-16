@@ -28,6 +28,8 @@ const Navbar = () => {
           <a href="#como-funciona" className="hover:text-foreground transition-colors">Como funciona</a>
           <a href="#beneficios" className="hover:text-foreground transition-colors">Benefícios</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+          <a href="/palestrantes" className="hover:text-foreground transition-colors">Sou Palestrante</a>
+          <a href="/influenciadores" className="hover:text-foreground transition-colors">Sou Influenciador/Expert</a>
         </div>
         
         {/* Desktop Actions */}
@@ -61,6 +63,12 @@ const Navbar = () => {
               </a>
               <a href="#faq" onClick={() => setIsOpen(false)} className="text-lg hover:text-primary transition-colors">
                 FAQ
+              </a>
+              <a href="/palestrantes" onClick={() => setIsOpen(false)} className="text-lg hover:text-primary transition-colors">
+                Sou Palestrante
+              </a>
+              <a href="/influenciadores" onClick={() => setIsOpen(false)} className="text-lg hover:text-primary transition-colors">
+                Sou Influenciador/Expert
               </a>
               
               <div className="flex flex-col gap-3 pt-4 border-t">
