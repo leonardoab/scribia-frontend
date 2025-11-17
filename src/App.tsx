@@ -67,7 +67,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={
                     <>
-                      <Navbar />
+                      <SimpleNavbar />
                       <Index />
                     </>
                   } />
