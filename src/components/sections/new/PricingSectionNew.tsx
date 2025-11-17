@@ -117,7 +117,7 @@ const PricingSectionNew = () => {
       
       if (!response.ok) throw new Error('Erro ao enviar');
       
-      toast.success("Sessão agendada com sucesso! Entraremos em contato em breve.");
+      toast.success("Mensagem enviada com sucesso. Aguarde o contato do Setor de Planejamento do ScribIA.");
       setFormData({ nome: '', empresa: '', email: '', whatsapp: '' });
       setIsDialogOpen(false);
     } catch (error) {
