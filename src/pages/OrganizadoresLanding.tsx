@@ -119,16 +119,16 @@ const OrganizadoresLanding = () => {
   const processSteps = [
     {
       icon: Target,
-      title: "Os participantes recebem acesso total ao ScribIA",
+      title: "Você decide como e quem receberá o acesso ao ScribIA",
       description:
-        "Ao contratar o ScribIA, todos os participantes ganham acesso à plataforma durante o evento — sem restrições, sem login complicado, sem travas. Eles podem entrar pelo QR Code ou link personalizado do evento.",
+        "Ao contratar o ScribIA, os participantes poderão ganhar acesso à plataforma durante o evento sem restrições, sem login complicado, sem fricção, quem gerencia os convites é a organização. O ScribIA pode também ser oferecido como upsell durante a venda dos ingressos.",
     },
     {
       icon: PlayCircle,
-      title: "Cada participante envia os áudios das palestras que quiser",
+      title: "Cada participante autorizado envia os áudios das palestras que quiser",
       description:
-        "Eles mesmos escolhem as palestras que desejam registrar, gravam diretamente no celular e enviam para o ScribIA em segundos. Nada passa pela sua equipe — tudo é self-service e fluido.",
-      note: "Se o organizador preferir (ou dependendo do plano), a equipe do ScribIA pode coletar todos os áudios do evento e gerar automaticamente os Livebooks oficiais de cada palestra.",
+        "Eles mesmos escolhem as palestras que desejam registrar no seu segundo cérebro no ScribIA. Gravam no celular e enviam o arquivo ou gravam diretamente na plataforma. Nada passa pela equipe do evento. Tudo é self-service e fluido.",
+      note: "Existe a possibilidade do organizador preferir a equipe do ScribIA pode coletar todos os áudios do evento e gerar automaticamente os Livebooks oficiais de cada palestra.",
     },
     {
       icon: Brain,
