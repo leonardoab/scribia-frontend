@@ -67,7 +67,8 @@ const OrganizadorLayout = () => {
       <main className={`${isMobile ? 'ml-0' : 'ml-64'} pt-16 min-h-screen`}>
         <div className="p-4 md:p-6">
           <Routes>
-            <Route index element={<OrganizadorDashboard />} />
+            <Route index element={<MeusEventos />} />
+            <Route path="dashboard/:eventoId" element={<OrganizadorDashboard />} />
             <Route path="eventos" element={<MeusEventos />} />
             <Route path="participantes" element={<Participantes />} />
             <Route path="palestras-livebooks" element={<PalestrasLivebooks />} />

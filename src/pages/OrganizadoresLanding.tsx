@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/sections/Hero";
 import ProblemSolution from "@/components/sections/ProblemSolution";
@@ -9,8 +10,46 @@ import PricingPlans from "@/components/sections/PricingPlans";
 import SocialProof from "@/components/sections/SocialProof";
 import FAQ from "@/components/sections/FAQ";
 import Footer from "@/components/sections/Footer";
+import { useCustomAuth } from "@/hooks/useCustomAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const OrganizadoresLanding = () => {
+  const navigate = useNavigate();
+  const { user } = useCustomAuth();
+
+  const handleCTAClick = async () => {
+    if (!user) {
+      navigate('/cadastro?tipo=organizador');
+      return;
+    }
+
+    const { data: orgData } = await supabase
+      .from('scribia_organizadores' as any)
+      .select('id')
+      .eq('user_id', user.profile.id)
+      .maybeSingle();
+
+    if (orgData) {
+      const { data: eventoData } = await (supabase
+        .from('scribia_eventos') as any)
+        .select('id')
+        .eq('organizador_id', (orgData as any).id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (eventoData) {
+        navigate(`/organizador/dashboard/${eventoData.id}`);
+      } else {
+        navigate('/organizador/criar-evento');
+      }
+      return;
+    }
+
+    navigate('/organizador/cadastro');
+  };
+
   const title = "Scribia — Página para Organizadores";
   const description = "Exemplos de conteúdo para organizadores (ajuste depois).";
   const canonical = "/organizadores";
@@ -136,8 +175,8 @@ const OrganizadoresLanding = () => {
           <p className="mb-6">✨ Leve o ScribIA para o seu próximo evento. Transforme cada palestra em um ativo vivo da sua marca.</p>
 
           <div className="mt-4">
-            <Button size="lg" className="bg-primary text-primary-foreground" asChild>
-              <a href="/organizadores#contato">Quero manter meu público engajado com o ScribIA</a>
+            <Button size="lg" className="bg-primary text-primary-foreground" onClick={handleCTAClick}>
+              Quero manter meu público engajado com o ScribIA
             </Button>
           </div>
         </section>
