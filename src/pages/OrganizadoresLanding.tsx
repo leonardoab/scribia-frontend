@@ -7,11 +7,11 @@ import Footer from "@/components/sections/Footer";
 import { useState, useEffect } from "react";
 import { keyBlackToTransparent } from "@/utils/image";
 import heroBg from "@/assets/organizadores-hero-bg.jpg";
-import { 
-  Sparkles, 
-  Users, 
-  TrendingUp, 
-  Gift, 
+import {
+  Sparkles,
+  Users,
+  TrendingUp,
+  Gift,
   Zap,
   Target,
   PlayCircle,
@@ -20,7 +20,7 @@ import {
   Repeat,
   Heart,
   ChevronRight,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 
 const OrganizadoresLanding = () => {
@@ -42,7 +42,7 @@ const OrganizadoresLanding = () => {
   }, []);
 
   const handleCTAClick = () => {
-    navigate('/teste-gratuito');
+    navigate("/teste-gratuito");
   };
 
   const title = "Scribia — Página para Organizadores";
@@ -66,71 +66,81 @@ const OrganizadoresLanding = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   const benefitsData = [
     {
       icon: Repeat,
       title: "Engajamento contínuo entre uma edição e outra",
-      description: "Cada palestra vira um Livebook interativo, que circula, gera conversa e mantém o público em contato com o evento através do Tutor ScribIA. Seu evento deixa de ser pontual, vira recorrente na vida das pessoas."
+      description:
+        "Cada palestra vira um Livebook interativo, que circula, gera conversa e mantém o público em contato com o evento através do Tutor ScribIA. Seu evento deixa de ser pontual, vira recorrente na vida das pessoas.",
     },
     {
       icon: Users,
       title: "Aumenta drasticamente a taxa de retorno dos participantes",
-      description: "Quando o público recebe valor contínuo, ele volta. Volta para a próxima edição, para comprar o próximo workshop, para participar da próxima formação. O ScribIA cria essa ponte."
+      description:
+        "Quando o público recebe valor contínuo, ele volta. Volta para a próxima edição, para comprar o próximo workshop, para participar da próxima formação. O ScribIA cria essa ponte.",
     },
     {
       icon: TrendingUp,
       title: "Uma nova forma de monetizar o pós-evento",
-      description: "Com os Livebooks, você pode vender trilhas de conteúdo, oferecer bônus exclusivos, criar clubes de assinatura do evento, aquecer leads para produtos educacionais e criar séries temáticas para manter o público ativo. É um pós-evento lucrativo, não apenas um 'arquivo morto'."
+      description:
+        "Com os Livebooks, você pode vender trilhas de conteúdo, oferecer bônus exclusivos, criar clubes de assinatura do evento, aquecer leads para produtos educacionais e criar séries temáticas para manter o público ativo. É um pós-evento lucrativo, não apenas um 'arquivo morto'.",
     },
     {
       icon: Gift,
       title: "Um presente que fortalece a marca do evento",
-      description: "Participantes sentem que receberam algo exclusivo e de altíssimo valor. Palestrantes se emocionam ao ver suas ideias ganhar formato profissional. Patrocinadores ganham presença inteligente no conteúdo. Resultado? Seu evento vira inesquecível."
+      description:
+        "Participantes sentem que receberam algo exclusivo e de altíssimo valor. Palestrantes se emocionam ao ver suas ideias ganhar formato profissional. Patrocinadores ganham presença inteligente no conteúdo. Resultado? Seu evento vira inesquecível.",
     },
     {
       icon: Zap,
       title: "Suas próximas vendas ficam muito mais fáceis",
-      description: "Quando as pessoas leem o Livebook na semana seguinte, comentam, compartilham e revisitam o conteúdo, elas permanecem aquecidas. Isso diminui o custo de aquisição, o esforço de remarketing e o tempo entre edições — e aumenta o interesse, o retorno e o valor da marca do evento."
-    }
+      description:
+        "Quando as pessoas leem o Livebook na semana seguinte, comentam, compartilham e revisitam o conteúdo, elas permanecem aquecidas. Isso diminui o custo de aquisição, o esforço de remarketing e o tempo entre edições — e aumenta o interesse, o retorno e o valor da marca do evento.",
+    },
   ];
 
   const processSteps = [
     {
       icon: Target,
       title: "Os participantes recebem acesso total ao ScribIA",
-      description: "Ao contratar o ScribIA, todos os participantes ganham acesso à plataforma durante o evento — sem restrições, sem login complicado, sem travas. Eles podem entrar pelo QR Code ou link personalizado do evento."
+      description:
+        "Ao contratar o ScribIA, todos os participantes ganham acesso à plataforma durante o evento — sem restrições, sem login complicado, sem travas. Eles podem entrar pelo QR Code ou link personalizado do evento.",
     },
     {
       icon: PlayCircle,
       title: "Cada participante envia os áudios das palestras que quiser",
-      description: "Eles mesmos escolhem as palestras que desejam registrar, gravam diretamente no celular e enviam para o ScribIA em segundos. Nada passa pela sua equipe — tudo é self-service e fluido.",
-      note: "Se o organizador preferir (ou dependendo do plano), a equipe do ScribIA pode coletar todos os áudios do evento e gerar automaticamente os Livebooks oficiais de cada palestra."
+      description:
+        "Eles mesmos escolhem as palestras que desejam registrar, gravam diretamente no celular e enviam para o ScribIA em segundos. Nada passa pela sua equipe — tudo é self-service e fluido.",
+      note: "Se o organizador preferir (ou dependendo do plano), a equipe do ScribIA pode coletar todos os áudios do evento e gerar automaticamente os Livebooks oficiais de cada palestra.",
     },
     {
       icon: Brain,
       title: "A IA transforma cada áudio em um Livebook inteligente",
-      description: "Para cada palestra enviada, o ScribIA cria um Livebook com insights estruturados, destaques, aplicações práticas, citações, slides comentados (caso fornecidos) e visual elegante e padronizado. É conteúdo profissional criado em segundos."
+      description:
+        "Para cada palestra enviada, o ScribIA cria um Livebook com insights estruturados, destaques, aplicações práticas, citações, slides comentados (caso fornecidos) e visual elegante e padronizado. É conteúdo profissional criado em segundos.",
     },
     {
       icon: Heart,
       title: "Seu público lê, compartilha e gera engajamento contínuo",
-      description: "Os participantes acessam seus Livebooks a qualquer momento. Eles compartilham trechos, revisam o conteúdo, conversam sobre os insights e mantêm o evento vivo muito além da programação."
+      description:
+        "Os participantes acessam seus Livebooks a qualquer momento. Eles compartilham trechos, revisam o conteúdo, conversam sobre os insights e mantêm o evento vivo muito além da programação.",
     },
     {
       icon: BarChart3,
       title: "Você recebe métricas reais de engajamento",
-      description: "No painel do organizador, você acompanha número de Livebooks criados, temas mais acessados, palestras mais gravadas, engajamento por trilha, alcance social, presença do patrocinador nos conteúdos e evolução do interesse entre palestras. Dados para melhorar as próximas edições, criar novos produtos, vender ingressos com mais facilidade e justificar investimentos para patrocinadores."
-    }
+      description:
+        "No painel do organizador, você acompanha número de Livebooks criados, temas mais acessados, palestras mais gravadas, engajamento por trilha, alcance social, presença do patrocinador nos conteúdos e evolução do interesse entre palestras. Dados para melhorar as próximas edições, criar novos produtos, vender ingressos com mais facilidade e justificar investimentos para patrocinadores.",
+    },
   ];
 
   const finalBenefits = [
@@ -140,7 +150,7 @@ const OrganizadoresLanding = () => {
     "Livebooks feitos pelos próprios participantes: Eles enviam os áudios das palestras que quiserem e recebem o conteúdo organizado automaticamente.",
     "Coleta completa opcional: Dependendo do plano, a equipe ScribIA pode capturar todos os áudios e gerar Livebooks oficiais.",
     "Patrocinadores mais satisfeitos: A marca deles aparece no conteúdo que realmente circula e engaja.",
-    "Experiência moderna e memorável: Seu evento ganha uma camada extra de valor, percebida imediatamente pelos participantes e palestrantes."
+    "Experiência moderna e memorável: Seu evento ganha uma camada extra de valor, percebida imediatamente pelos participantes e palestrantes.",
   ];
 
   return (
@@ -156,7 +166,7 @@ const OrganizadoresLanding = () => {
       </Helmet>
 
       {/* Navbar */}
-      <header 
+      <header
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           isScrolled ? "bg-background/98 shadow-md backdrop-blur-md" : "bg-background/98 backdrop-blur-md"
         } border-b`}
@@ -165,10 +175,18 @@ const OrganizadoresLanding = () => {
           <a href="/" className="flex items-center h-12">
             <img src={logoSrc} alt="ScribIA logo" className="h-full w-auto" />
           </a>
-          
+
           <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <li><a href="#o-que-e" className="hover:text-primary transition-colors">O que é?</a></li>
-            <li><a href="#como-funciona" className="hover:text-primary transition-colors">Como funciona</a></li>
+            <li>
+              <a href="#o-que-e" className="hover:text-primary transition-colors">
+                O que é?
+              </a>
+            </li>
+            <li>
+              <a href="#como-funciona" className="hover:text-primary transition-colors">
+                Como funciona
+              </a>
+            </li>
           </ul>
 
           <div className="hidden md:flex items-center gap-3">
@@ -187,8 +205,8 @@ const OrganizadoresLanding = () => {
 
       <main className="min-h-screen bg-background pt-16">
         <section className="relative overflow-hidden py-20 md:py-32">
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${heroBg})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/70 to-background/80" />
@@ -203,17 +221,18 @@ const OrganizadoresLanding = () => {
                 <Sparkles className="h-4 w-4" />
                 <span>Para Organizadores de Eventos</span>
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
                 Transforme seu evento em um motor contínuo de engajamento, comunidade e vendas
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-                Você já percebeu que o verdadeiro desafio de um evento não é só realizá-lo com perfeição, mas manter as pessoas aquecidas, engajadas e conectadas depois que ele termina?
+                Você já percebeu que o verdadeiro desafio de um evento não é só realizá-lo com perfeição, mas manter as
+                pessoas aquecidas, engajadas e conectadas depois que ele termina?
               </p>
 
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 onClick={handleCTAClick}
                 className="group relative overflow-hidden px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
@@ -236,18 +255,15 @@ const OrganizadoresLanding = () => {
               className="max-w-4xl mx-auto"
             >
               <motion.div variants={itemVariants}>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-                  E você já se perguntou:
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">E você já se perguntou:</h2>
               </motion.div>
 
               <div className="grid md:grid-cols-2 gap-4 mb-8">
                 {[
                   "Como manter seu público interessado pela marca do evento durante o ano inteiro?",
                   "Como transformar participantes em uma comunidade ativa e receptiva aos próximos convites?",
-                  "Como reduzir o custo de aquisição para as próximas edições?",
                   "Como fazer com que o evento deixe de ser 'único' e se torne parte da rotina do público?",
-                  "Como vender mentorias, cursos, produtos ou novos eventos sem ter que começar do zero toda vez?"
+                  "Como vender mentorias, cursos, produtos ou novos eventos sem ter que começar do zero toda vez?",
                 ].map((question, idx) => (
                   <motion.div key={idx} variants={itemVariants}>
                     <Card className="h-full hover:shadow-md transition-all duration-300 border-l-4 border-l-primary">
@@ -261,7 +277,8 @@ const OrganizadoresLanding = () => {
 
               <motion.div variants={itemVariants} className="text-center">
                 <p className="text-lg text-muted-foreground italic">
-                  E se existisse uma forma de continuar presente — de manter o público engajado, aquecido e esperando ansiosamente pelo próximo movimento?
+                  E se existisse uma forma de continuar presente — de manter o público engajado, aquecido e esperando
+                  ansiosamente pelo próximo movimento?
                 </p>
               </motion.div>
             </motion.div>
@@ -277,11 +294,10 @@ const OrganizadoresLanding = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  O ScribIA faz exatamente isso
-                </h2>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">O ScribIA faz exatamente isso</h2>
                 <p className="text-lg text-muted-foreground">
-                  Transforma seu evento em um ecossistema vivo, onde a sua marca continua conversando com o público muito depois do encerramento.
+                  Transforma seu evento em um ecossistema vivo, onde a sua marca continua conversando com o público
+                  muito depois do encerramento.
                 </p>
               </motion.div>
             </div>
@@ -339,9 +355,7 @@ const OrganizadoresLanding = () => {
               <div className="inline-flex items-center gap-2 text-primary mb-4">
                 <span className="text-4xl">🔵</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Como o ScribIA Funciona Para Organizadores
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Como o ScribIA Funciona Para Organizadores</h2>
             </motion.div>
 
             <div className="max-w-4xl mx-auto space-y-6">
@@ -393,9 +407,7 @@ const OrganizadoresLanding = () => {
               <div className="inline-flex items-center gap-2 text-primary mb-4">
                 <span className="text-4xl">💎</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Benefícios do ScribIA para Organizadores
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Benefícios do ScribIA para Organizadores</h2>
             </motion.div>
 
             <motion.div
@@ -406,9 +418,9 @@ const OrganizadoresLanding = () => {
               className="max-w-4xl mx-auto grid md:grid-cols-2 gap-4"
             >
               {finalBenefits.map((benefit, idx) => {
-                const [title, ...descParts] = benefit.split(':');
-                const description = descParts.join(':');
-                
+                const [title, ...descParts] = benefit.split(":");
+                const description = descParts.join(":");
+
                 return (
                   <motion.div key={idx} variants={itemVariants}>
                     <Card className="h-full hover:shadow-md transition-all duration-300">
@@ -438,14 +450,15 @@ const OrganizadoresLanding = () => {
               className="max-w-3xl mx-auto text-center"
             >
               <p className="text-xl md:text-2xl mb-6 font-medium">
-                Você quer organizar um evento… ou criar uma experiência que continua gerando valor, comunidade e vendas durante o ano inteiro?
+                Você quer organizar um evento… ou criar uma experiência que continua gerando valor, comunidade e vendas
+                durante o ano inteiro?
               </p>
               <p className="text-lg text-muted-foreground mb-8">
                 ✨ Leve o ScribIA para o seu próximo evento. Transforme cada palestra em um ativo vivo da sua marca.
               </p>
 
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 onClick={handleCTAClick}
                 className="group relative overflow-hidden px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
@@ -458,7 +471,7 @@ const OrganizadoresLanding = () => {
           </div>
         </section>
       </main>
-      
+
       <Footer />
     </>
   );
