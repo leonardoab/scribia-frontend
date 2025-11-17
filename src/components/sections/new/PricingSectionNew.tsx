@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Check, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const plans = [
   {
@@ -50,6 +54,79 @@ const plans = [
 
 const PricingSectionNew = () => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    nome: '',
+    empresa: '',
+    email: '',
+    whatsapp: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formatWhatsApp = (value: string): string => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `(${digits.slice(0,2)}) ${digits.slice(2)}`;
+    if (digits.length <= 11) 
+      return `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
+    return `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7,11)}`;
+  };
+
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const whatsappDigits = formData.whatsapp.replace(/\D/g, '');
+    
+    if (!formData.nome.trim()) {
+      toast.error("Por favor, preencha seu nome");
+      return false;
+    }
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Email inválido");
+      return false;
+    }
+    if (whatsappDigits.length < 10 || whatsappDigits.length > 11) {
+      toast.error("WhatsApp deve ter 10 ou 11 dígitos");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const payload = {
+        nome: formData.nome.trim(),
+        empresa: formData.empresa.trim() || null,
+        email: formData.email.trim(),
+        whatsapp: formData.whatsapp.replace(/\D/g, '')
+      };
+      
+      const response = await fetch(
+        'https://sabrinaseibert.app.n8n.cloud/webhook/sessaoestrategica',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
+      );
+      
+      if (!response.ok) throw new Error('Erro ao enviar');
+      
+      toast.success("Sessão agendada com sucesso! Entraremos em contato em breve.");
+      setFormData({ nome: '', empresa: '', email: '', whatsapp: '' });
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Erro ao enviar:', error);
+      toast.error("Erro ao agendar sessão. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section id="precos" className="py-16 md:py-24 bg-gradient-to-b from-primary/10 to-secondary/10">
@@ -124,6 +201,11 @@ const PricingSectionNew = () => {
                   variant={plan.featured ? "cta" : "outline"} 
                   size="lg" 
                   className="w-full"
+                  onClick={() => {
+                    if (plan.cta === "Agende sua Sessão") {
+                      setIsDialogOpen(true);
+                    }
+                  }}
                 >
                   {plan.cta}
                 </Button>
@@ -131,6 +213,67 @@ const PricingSectionNew = () => {
             </Card>
           ))}
         </div>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Quero agendar uma Sessão</DialogTitle>
+              <DialogDescription>
+                Preencha os dados abaixo para agendar sua sessão estratégica
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="nome">Nome Completo *</Label>
+                <Input
+                  id="nome"
+                  value={formData.nome}
+                  onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                  required
+                  maxLength={120}
+                />
+              </div>
+              <div>
+                <Label htmlFor="empresa">Empresa</Label>
+                <Input
+                  id="empresa"
+                  value={formData.empresa}
+                  onChange={(e) => setFormData({...formData, empresa: e.target.value})}
+                  maxLength={120}
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
+                  maxLength={255}
+                />
+              </div>
+              <div>
+                <Label htmlFor="whatsapp">WhatsApp *</Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  value={formData.whatsapp}
+                  onChange={(e) => setFormData({
+                    ...formData, 
+                    whatsapp: formatWhatsApp(e.target.value)
+                  })}
+                  placeholder="(11) 99999-9999"
+                  required
+                  maxLength={15}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Enviando..." : "Agendar Sessão"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );

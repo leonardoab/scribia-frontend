@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { keyBlackToTransparent } from "@/utils/image";
 import { SITE } from "@/utils/constants";
 
@@ -31,14 +33,19 @@ const SimpleNavbar = () => {
         </a>
         
         <ul className="hidden md:flex items-center gap-8 text-sm font-medium mx-auto">
-          <li><a href="/#solucao" className="hover:text-primary transition-colors">Solução</a></li>
-          <li><a href="/#recursos" className="hover:text-primary transition-colors">Recursos</a></li>
-          <li><a href="/#precos" className="hover:text-primary transition-colors">Preços</a></li>
-          <li><a href="/#faq" className="hover:text-primary transition-colors">FAQ</a></li>
+          <li><a href="/#como-funciona" className="hover:text-primary transition-colors">Como funciona</a></li>
+          <li><a href="/#precos" className="hover:text-primary transition-colors">Planos</a></li>
           <li><a href="/#contato" className="hover:text-primary transition-colors">Contato</a></li>
         </ul>
 
-        <div className="hidden md:block w-32"></div>
+        <div className="hidden md:flex items-center gap-3">
+          <Link to="/login">
+            <Button variant="ghost" size="sm">Login</Button>
+          </Link>
+          <Link to="/cadastro">
+            <Button variant="default" size="sm">Criar Conta</Button>
+          </Link>
+        </div>
       </nav>
     </header>
   );
