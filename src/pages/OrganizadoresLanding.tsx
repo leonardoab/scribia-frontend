@@ -191,12 +191,18 @@ const OrganizadoresLanding = () => {
           </ul>
 
           <div className="hidden md:flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+              Login
+            </Button>
             <Button variant="cta" size="sm" onClick={handleCTAClick}>
               Quero me inscrever
             </Button>
           </div>
 
           <div className="flex md:hidden items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+              Login
+            </Button>
             <Button variant="cta" size="sm" onClick={handleCTAClick}>
               Inscrever-se
             </Button>
