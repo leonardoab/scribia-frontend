@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Footer from "@/components/sections/Footer";
-import { useCustomAuth } from "@/hooks/useCustomAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { keyBlackToTransparent } from "@/utils/image";
 import { 
@@ -26,7 +24,6 @@ import {
 
 const OrganizadoresLanding = () => {
   const navigate = useNavigate();
-  const { user } = useCustomAuth();
   const [logoSrc, setLogoSrc] = useState("/lovable-uploads/scribia-logo-new.png");
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -43,36 +40,8 @@ const OrganizadoresLanding = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleCTAClick = async () => {
-    if (!user) {
-      navigate('/cadastro?tipo=organizador');
-      return;
-    }
-
-    const { data: orgData } = await supabase
-      .from('scribia_organizadores' as any)
-      .select('id')
-      .eq('user_id', user.profile.id)
-      .maybeSingle();
-
-    if (orgData) {
-      const { data: eventoData } = await (supabase
-        .from('scribia_eventos') as any)
-        .select('id')
-        .eq('organizador_id', (orgData as any).id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (eventoData) {
-        navigate(`/organizador/dashboard/${eventoData.id}`);
-      } else {
-        navigate('/organizador/criar-evento');
-      }
-      return;
-    }
-
-    navigate('/organizador/cadastro');
+  const handleCTAClick = () => {
+    navigate('/teste-gratuito');
   };
 
   const title = "Scribia — Página para Organizadores";
@@ -202,18 +171,12 @@ const OrganizadoresLanding = () => {
           </ul>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <a href="/login">Login</a>
-            </Button>
             <Button variant="cta" size="sm" onClick={handleCTAClick}>
               Quero me inscrever
             </Button>
           </div>
 
           <div className="flex md:hidden items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <a href="/login">Login</a>
-            </Button>
             <Button variant="cta" size="sm" onClick={handleCTAClick}>
               Inscrever-se
             </Button>
