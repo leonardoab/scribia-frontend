@@ -154,9 +154,8 @@ const OrganizadoresLanding = () => {
     "Engajamento contínuo: Seu público permanece ativo e conectado ao evento mesmo depois do encerramento.",
     "Público aquecido para próximas edições: Os Livebooks mantêm a atenção do participante, facilitando a venda da próxima edição.",
     "Inteligência para novos produtos: As métricas mostram quais temas geraram mais interesse — perfeito para criar trilhas, workshops e eventos satélites.",
-    "Livebooks feitos pelos próprios participantes: Eles enviam os áudios das palestras que quiserem e recebem o conteúdo organizado automaticamente.",
-    "Coleta completa opcional: Dependendo do plano, a equipe ScribIA pode capturar todos os áudios e gerar Livebooks oficiais.",
     "Patrocinadores mais satisfeitos: A marca deles aparece no conteúdo que realmente circula e engaja.",
+    "Coleta completa opcional: Dependendo do plano, a equipe ScribIA pode capturar todos os áudios e gerar Livebooks oficiais.",
     "Experiência moderna e memorável: Seu evento ganha uma camada extra de valor, percebida imediatamente pelos participantes e palestrantes.",
   ];
 
