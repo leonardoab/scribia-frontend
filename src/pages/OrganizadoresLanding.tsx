@@ -134,19 +134,19 @@ const OrganizadoresLanding = () => {
       icon: Brain,
       title: "A IA transforma cada áudio em um Livebook inteligente",
       description:
-        "Para cada palestra enviada, o ScribIA cria um Livebook com insights estruturados, destaques, aplicações práticas, citações, slides comentados (caso fornecidos) e visual elegante e padronizado. É conteúdo profissional criado em segundos.",
+        "Para cada palestra enviada, o ScribIA cria um Livebook personalizado, de acordo com o perfil do usuário. Portanto, o Livebook de um participante não será igual ao do outro, pois nossa IA cria os textos como se o próprio usuário tivesse criando. Todo esse conteúdo alimenta o tutor do ScribIA, que funcionará como um segundo cérebro especializado em tudo o que o usuário já aprendeu ou ouviu.",
     },
     {
       icon: Heart,
-      title: "Seu público lê, compartilha e gera engajamento contínuo",
+      title: "Seu público lê, compartilha e revisita informações do evento com o apoio da Inteligência Artificial gerando engajamento contínuo",
       description:
-        "Os participantes acessam seus Livebooks a qualquer momento. Eles compartilham trechos, revisam o conteúdo, conversam sobre os insights e mantêm o evento vivo muito além da programação.",
+        "Os participantes acessam seus Livebooks a qualquer momento, tiram dúvidas sobre o que aprenderam, buscam outras fontes dos palestrantes ou materiais para aprofundar no assunto. Na comunidade compartilham trechos, revisam o conteúdo, conversam sobre os insights e mantêm o evento vivo muito além da programação.",
     },
     {
       icon: BarChart3,
       title: "Você recebe métricas reais de engajamento",
       description:
-        "No painel do organizador, você acompanha número de Livebooks criados, temas mais acessados, palestras mais gravadas, engajamento por trilha, alcance social, presença do patrocinador nos conteúdos e evolução do interesse entre palestras. Dados para melhorar as próximas edições, criar novos produtos, vender ingressos com mais facilidade e justificar investimentos para patrocinadores.",
+        "No painel do organizador, você acompanha número de Livebooks criados, temas mais acessados, palestras mais gravadas, palestrante mais procurado, engajamento por trilha, alcance social, presença do patrocinador nos conteúdos e evolução do interesse entre palestras. Dados para melhorar as próximas edições, criar novos produtos, vender ingressos com mais facilidade e justificar investimentos para patrocinadores.",
     },
   ];
 
