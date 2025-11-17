@@ -199,16 +199,23 @@ const OrganizadoresLanding = () => {
           <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
             <li><a href="#o-que-e" className="hover:text-primary transition-colors">O que é?</a></li>
             <li><a href="#como-funciona" className="hover:text-primary transition-colors">Como funciona</a></li>
-            <li>
-              <Button variant="cta" size="sm" onClick={handleCTAClick}>
-                Quero me inscrever
-              </Button>
-            </li>
           </ul>
 
-          <div className="flex md:hidden items-center">
+          <div className="hidden md:flex items-center gap-3">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/login">Login</a>
+            </Button>
             <Button variant="cta" size="sm" onClick={handleCTAClick}>
               Quero me inscrever
+            </Button>
+          </div>
+
+          <div className="flex md:hidden items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/login">Login</a>
+            </Button>
+            <Button variant="cta" size="sm" onClick={handleCTAClick}>
+              Inscrever-se
             </Button>
           </div>
         </nav>
