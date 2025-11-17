@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import Footer from "@/components/sections/Footer";
 import { useCustomAuth } from "@/hooks/useCustomAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+import { keyBlackToTransparent } from "@/utils/image";
 import { 
   Sparkles, 
   Users, 
@@ -25,6 +27,21 @@ import {
 const OrganizadoresLanding = () => {
   const navigate = useNavigate();
   const { user } = useCustomAuth();
+  const [logoSrc, setLogoSrc] = useState("/lovable-uploads/scribia-logo-new.png");
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    keyBlackToTransparent("/lovable-uploads/scribia-logo-new.png", 24)
+      .then(setLogoSrc)
+      .catch(() => {});
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleCTAClick = async () => {
     if (!user) {
@@ -168,16 +185,36 @@ const OrganizadoresLanding = () => {
         <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
       </Helmet>
 
-      <main className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 pt-6">
-          <Button variant="ghost" asChild className="group">
-            <a href="/" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span>Voltar para a Home</span>
-            </a>
-          </Button>
-        </div>
+      {/* Navbar */}
+      <header 
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          isScrolled ? "bg-background/98 shadow-md backdrop-blur-md" : "bg-background/98 backdrop-blur-md"
+        } border-b`}
+      >
+        <nav className="container mx-auto flex h-16 items-center justify-between px-4">
+          <a href="/" className="flex items-center h-12">
+            <img src={logoSrc} alt="ScribIA logo" className="h-full w-auto" />
+          </a>
+          
+          <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
+            <li><a href="#o-que-e" className="hover:text-primary transition-colors">O que é?</a></li>
+            <li><a href="#como-funciona" className="hover:text-primary transition-colors">Como funciona</a></li>
+            <li>
+              <Button variant="cta" size="sm" onClick={handleCTAClick}>
+                Quero me inscrever
+              </Button>
+            </li>
+          </ul>
 
+          <div className="flex md:hidden items-center">
+            <Button variant="cta" size="sm" onClick={handleCTAClick}>
+              Quero me inscrever
+            </Button>
+          </div>
+        </nav>
+      </header>
+
+      <main className="min-h-screen bg-background pt-16">
         <section className="relative overflow-hidden py-20 md:py-32">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent" />
           <div className="container mx-auto px-4 relative z-10">
@@ -256,7 +293,7 @@ const OrganizadoresLanding = () => {
           </div>
         </section>
 
-        <section className="py-16">
+        <section id="o-que-e" className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center mb-12">
               <motion.div
@@ -316,7 +353,7 @@ const OrganizadoresLanding = () => {
           </div>
         </section>
 
-        <section className="py-16">
+        <section id="como-funciona" className="py-16">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
