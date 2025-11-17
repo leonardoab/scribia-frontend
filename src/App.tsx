@@ -42,6 +42,9 @@ const OrganizadoresLanding = lazy(() => import("./pages/OrganizadoresLanding"));
 const PalestrantesLanding = lazy(() => import("./pages/PalestrantesLanding"));
 const PatrocinadoresLanding = lazy(() => import("./pages/PatrocinadoresLanding"));
 
+const CadastroOrganizador = lazy(() => import("./pages/organizador/CadastroOrganizador"));
+const CriarEvento = lazy(() => import("./pages/organizador/CriarEvento"));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen bg-background">
@@ -95,6 +98,16 @@ const App = () => (
                   <Route path="/dashboard-old" element={
                     <AuthGuard>
                       <Dashboard />
+                    </AuthGuard>
+                  } />
+                  <Route path="/organizador/cadastro" element={
+                    <AuthGuard>
+                      <CadastroOrganizador />
+                    </AuthGuard>
+                  } />
+                  <Route path="/organizador/criar-evento" element={
+                    <AuthGuard>
+                      <CriarEvento />
                     </AuthGuard>
                   } />
                   <Route path="/organizador/*" element={
