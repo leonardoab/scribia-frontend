@@ -142,7 +142,7 @@ const App = () => (
                       <PatrocinadoresLanding />
                     </>
                   } />
-                  <Route path="/selecionar-plano" element={
+                  <Route path="/home" element={
                     <>
                       <SimpleNavbar />
                       <SelecionarPlano />

@@ -1,7 +1,7 @@
 export const SITE = {
   name: "Scribia",
   url: "https://www.scribia.app.br/",
-  contactEmail: "contato@scribia.ai",
+  contactEmail: "suporte@scribia.com.br",
   twitter: "@scribia_ai",
 };
 
