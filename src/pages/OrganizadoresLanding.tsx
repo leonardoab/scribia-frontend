@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Footer from "@/components/sections/Footer";
 import { useState, useEffect } from "react";
 import { keyBlackToTransparent } from "@/utils/image";
+import heroBg from "@/assets/organizadores-hero-bg.jpg";
 import { 
   Sparkles, 
   Users, 
@@ -186,7 +187,11 @@ const OrganizadoresLanding = () => {
 
       <main className="min-h-screen bg-background pt-16">
         <section className="relative overflow-hidden py-20 md:py-32">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent" />
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+            style={{ backgroundImage: `url(${heroBg})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/70 to-background/80" />
           <div className="container mx-auto px-4 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
