@@ -43,7 +43,7 @@ const OrganizadoresLanding = () => {
   }, []);
 
   const handleCTAClick = () => {
-    navigate("/teste-gratuito");
+    navigate("/cadastro-organizador");
   };
 
   const title = "Scribia — Página para Organizadores";

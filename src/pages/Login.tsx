@@ -28,8 +28,18 @@ export default function Login() {
       if (result.success) {
         toast.success("Login realizado com sucesso!");
         
-        // Redirecionar para definição de perfil se necessário
-        if (result.needsProfile) {
+        // Redirecionar baseado no role do usuário
+        if (result.user?.roles && result.user.roles.length > 0) {
+          const userRole = result.user.roles[0];
+          
+          if (userRole === 'organizador_evento') {
+            navigate("/organizador/eventos");
+          } else if (result.needsProfile) {
+            navigate("/definir-perfil");
+          } else {
+            navigate("/dashboard");
+          }
+        } else if (result.needsProfile) {
           navigate("/definir-perfil");
         } else {
           navigate("/dashboard");
