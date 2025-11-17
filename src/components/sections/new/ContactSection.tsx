@@ -8,56 +8,53 @@ import { toast } from "sonner";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+
     if (!formData.name.trim()) {
       toast.error("Por favor, preencha seu nome");
       return;
     }
-    
+
     if (!emailRegex.test(formData.email)) {
       toast.error("Email inválido");
       return;
     }
-    
+
     if (!formData.message.trim()) {
       toast.error("Por favor, escreva uma mensagem");
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const payload = {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        message: formData.message.trim()
+        message: formData.message.trim(),
       };
-      
-      const response = await fetch(
-        'https://sabrinaseibert.app.n8n.cloud/webhook/emailcontato',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }
-      );
-      
-      if (!response.ok) throw new Error('Erro ao enviar');
-      
+
+      const response = await fetch("https://sabrinaseibert.app.n8n.cloud/webhook-test/emailcontato", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Erro ao enviar");
+
       toast.success("Mensagem enviada com sucesso! Entraremos em contato em breve.");
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      console.error('Erro ao enviar:', error);
+      console.error("Erro ao enviar:", error);
       toast.error("Erro ao enviar mensagem. Tente novamente.");
     } finally {
       setIsSubmitting(false);
@@ -77,23 +74,23 @@ const ContactSection = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name">Nome</Label>
-                <Input 
-                  id="name" 
-                  placeholder="Seu nome" 
+                <Input
+                  id="name"
+                  placeholder="Seu nome"
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                   maxLength={100}
                 />
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="seu@email.com" 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   maxLength={255}
                 />
@@ -101,11 +98,11 @@ const ContactSection = () => {
             </div>
             <div>
               <Label htmlFor="message">Mensagem</Label>
-              <Textarea 
-                id="message" 
-                placeholder="Conte sobre seu evento" 
+              <Textarea
+                id="message"
+                placeholder="Conte sobre seu evento"
                 value={formData.message}
-                onChange={(e) => setFormData({...formData, message: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 required
                 maxLength={1000}
               />
