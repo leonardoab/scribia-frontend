@@ -108,6 +108,12 @@ const OrganizadoresLanding = () => {
       description:
         "Quando as pessoas leem o Livebook na semana seguinte, comentam, compartilham e revisitam o conteúdo, elas permanecem aquecidas. Isso diminui o custo de aquisição, o esforço de remarketing e o tempo entre edições, e aumenta o interesse, o retorno e o valor da marca do evento.",
     },
+    {
+      icon: Heart,
+      title: "Seus patrocinadores ficam mais engajados e planejam voltar",
+      description:
+        "Com métricas claras de alcance e impacto dentro dos Livebooks, seus patrocinadores enxergam valor real na parceria. Eles veem sua marca sendo revisitada, clicada e lembrada dias e semanas após o evento, cada vez que um usuário faz a busca por um livebook. Isso fortalece o relacionamento e aumenta muito a chance de renovação ou ampliação da parceria.",
+    },
   ];
 
   const processSteps = [
