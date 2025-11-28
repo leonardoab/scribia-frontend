@@ -169,18 +169,14 @@ const PricingPlans = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Planos para você e para o seu evento
+            Planos para você
           </h2>
           <p className="text-lg text-muted-foreground">
             Escolha o que faz sentido agora — evolua quando precisar.
           </p>
         </div>
 
-        <div className="space-y-12">
-          {/* B2C Plans */}
-          <div>
-            <h3 className="text-2xl font-bold text-center mb-8">Para Congressistas</h3>
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {b2cPlans.map((plan, index) => {
                 const Icon = plan.icon;
                 return (
@@ -216,47 +212,8 @@ const PricingPlans = () => {
                       </Button>
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* B2B Plans */}
-          <div>
-            <h3 className="text-2xl font-bold text-center mb-8">Para Organizadores</h3>
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {b2bPlans.map((plan, index) => {
-                const Icon = plan.icon;
-                return (
-                  <Card key={index} className="relative shadow-elegant hover-scale">
-                    <Badge 
-                      variant="secondary" 
-                      className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-secondary text-secondary-foreground"
-                    >
-                      {plan.badge}
-                    </Badge>
-                    <CardHeader className="text-center pt-8">
-                      <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Icon className="h-6 w-6 text-primary" />
-                      </div>
-                      <CardTitle className="text-xl">{plan.name}</CardTitle>
-                      <p className="text-lg font-semibold text-primary">{plan.price}</p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <ul className="space-y-3">
-                        {plan.features.map((feature, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <Check className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                            <span className="text-sm">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
+              );
+            })}
         </div>
 
         {/* Dialog for free plan */}
