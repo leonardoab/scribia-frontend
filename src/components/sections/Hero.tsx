@@ -18,6 +18,9 @@ const Hero = () => {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
               {COPY.headline}
             </h1>
+            <p className="text-xl md:text-2xl font-medium text-primary/80">
+              {COPY.tagline}
+            </p>
             <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
               {COPY.subheadline}
             </p>

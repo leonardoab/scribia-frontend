@@ -6,7 +6,8 @@ export const SITE = {
 };
 
 export const COPY = {
-  headline: "Transforme palestras em ebooks inteligentes com IA. Não perca mais o conteúdo no pós-evento.",
+  headline: "Transforme palestras em ebooks inteligentes com IA.",
+  tagline: "Não perca mais o conteúdo no pós-evento.",
   subheadline:
     "Do palco ao seu celular ou computador em poucos minutos após a palestra: grave os insights, dados e referências organizados. Acesso imediato por QR Code na tela do evento ou na plataforma do ScribIA.",
   ctaPrimary: "Solicitar Demonstração Gratuita",
