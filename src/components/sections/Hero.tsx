@@ -25,14 +25,14 @@ const Hero = () => {
               {COPY.subheadline}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#lead">
-                <Button variant="cta" size="lg" className="hover-scale">
-                  {COPY.ctaPrimary}
-                </Button>
-              </a>
-              <a href="#como-funciona" className="story-link text-sm sm:text-base">
+              <Button 
+                variant="cta" 
+                size="lg" 
+                className="hover-scale"
+                onClick={() => {/* Link do vídeo será adicionado posteriormente */}}
+              >
                 Ver como funciona
-              </a>
+              </Button>
             </div>
             <div className="flex items-center gap-6 pt-4 text-muted-foreground">
               <div className="flex items-center gap-2">
