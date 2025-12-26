@@ -189,7 +189,8 @@ async function handleAudioUrlTranscription(req: Request) {
 
   const deepgramApiKey = Deno.env.get('DEEPGRAM_API_KEY');
   if (!deepgramApiKey) {
-    throw new Error('DEEPGRAM_API_KEY não configurada');
+    console.error('❌ DEEPGRAM_API_KEY não encontrada nas variáveis de ambiente');
+    throw new Error('Erro de configuração: API de transcrição não disponível. Contate o suporte.');
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
