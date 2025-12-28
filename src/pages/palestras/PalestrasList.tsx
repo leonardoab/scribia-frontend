@@ -27,6 +27,7 @@ const PalestrasList = () => {
   const { toast } = useToast();
 
   const [palestras, setPalestras] = useState<Palestra[]>([]);
+  const [livebookStatuses, setLivebookStatuses] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [palestraToDelete, setPalestraToDelete] = useState<string | null>(null);
@@ -79,7 +80,11 @@ const PalestrasList = () => {
       if (error) throw error;
       
       if ((data as any)?.success) {
-        setPalestras((data as any).palestras || []);
+        const palestrasData = (data as any).palestras || [];
+        setPalestras(palestrasData);
+        
+        // Buscar status dos livebooks para cada palestra
+        await fetchLivebookStatuses(palestrasData, userId);
       } else {
         throw new Error((data as any)?.error || 'Erro ao carregar palestras');
       }
@@ -91,6 +96,32 @@ const PalestrasList = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLivebookStatuses = async (palestrasData: Palestra[], userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('scribia_get_livebooks' as any, {
+        p_usuario_id: userId,
+        p_evento_id: eventoId,
+      });
+
+      if (error) throw error;
+      
+      if ((data as any)?.success) {
+        const livebooks = (data as any).livebooks || [];
+        const statusMap: Record<string, string> = {};
+        
+        livebooks.forEach((lb: any) => {
+          if (lb.palestra?.id) {
+            statusMap[lb.palestra.id] = lb.status;
+          }
+        });
+        
+        setLivebookStatuses(statusMap);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar status dos livebooks:', error);
     }
   };
 
@@ -329,6 +360,7 @@ const PalestrasList = () => {
             onOpenChange={setEditDialogOpen}
             palestra={palestraToEdit}
             onSuccess={fetchPalestras}
+            livebookStatus={livebookStatuses[palestraToEdit.id] || null}
           />
         )}
 

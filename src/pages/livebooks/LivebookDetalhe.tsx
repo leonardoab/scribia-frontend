@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Edit2, Save, X, Download, Eye, FileText, Loader2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Edit2, Save, X, Download, Eye, FileText, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -51,6 +51,7 @@ export default function LivebookDetalhe() {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [showRemoveEventoDialog, setShowRemoveEventoDialog] = useState(false);
   
@@ -160,6 +161,35 @@ export default function LivebookDetalhe() {
     } finally {
       setSaving(false);
       setShowRemoveEventoDialog(false);
+    }
+  };
+
+  const handleFinalizarLivebook = async () => {
+    if (!livebook) return;
+    
+    try {
+      setFinalizing(true);
+      
+      const { data, error } = await supabase.rpc('scribia_finalizar_livebook' as any, {
+        p_livebook_id: livebook.id,
+        p_usuario_id: user!.id,
+      });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; error?: string; message?: string };
+
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao finalizar livebook');
+      }
+
+      toast.success(result.message || 'Livebook marcado como concluído!');
+      await fetchLivebook();
+    } catch (error: any) {
+      console.error('Erro ao finalizar livebook:', error);
+      toast.error(error.message || 'Erro ao finalizar livebook');
+    } finally {
+      setFinalizing(false);
     }
   };
 
@@ -364,9 +394,15 @@ export default function LivebookDetalhe() {
         {livebook.status === 'concluido' && (livebook.pdf_url || livebook.html_url || livebook.docx_url) && (
           <Card>
             <CardHeader>
-              <CardTitle>Arquivos Gerados</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Arquivos Gerados</CardTitle>
+                <Badge className="bg-green-500 text-white">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Concluído
+                </Badge>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-3">
                 {livebook.pdf_url && (
                   <Button
@@ -394,6 +430,41 @@ export default function LivebookDetalhe() {
                   </Button>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Botão para marcar como concluído (quando gerado mas não finalizado) */}
+        {livebook.status !== 'concluido' && livebook.status !== 'erro' && (livebook.pdf_url || livebook.html_url || livebook.docx_url) && (
+          <Card className="border-primary/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                Finalizar Edição
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Após revisar e editar o livebook, marque como concluído para finalizar o processo. 
+                Isso travará alterações de nível e formato na palestra original.
+              </p>
+              <Button 
+                onClick={handleFinalizarLivebook} 
+                disabled={finalizing}
+                className="w-full sm:w-auto"
+              >
+                {finalizing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Finalizando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Marcar como Concluído
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         )}
