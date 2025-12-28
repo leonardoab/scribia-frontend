@@ -94,9 +94,10 @@ export async function uploadAudioToTranscribe(
   );
   
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error('❌ Erro na transcrição:', errorData);
-    throw new Error(`Erro ao iniciar transcrição: ${response.status}`);
+    const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+    const errorMessage = errorData?.error || errorData?.message || `HTTP ${response.status}`;
+    console.error('❌ Erro na transcrição:', response.status, errorMessage, errorData);
+    throw new Error(`Erro na transcrição: ${errorMessage}`);
   }
   
   const result = await response.json();

@@ -1,3 +1,5 @@
+// scribia-transcribe v2.1 - 2025-06-28 - Deepgram API
+// Força redeploy após correção de erro legado
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -220,8 +222,18 @@ async function handleAudioUrlTranscription(req: Request) {
 
   if (!deepgramResponse.ok) {
     const errorText = await deepgramResponse.text();
-    console.error(`[${palestra_id}] ❌ Erro Deepgram:`, deepgramResponse.status, errorText);
-    throw new Error(`Deepgram error: ${deepgramResponse.status} - ${errorText}`);
+    console.error(`[${palestra_id}] ❌ Erro Deepgram (status ${deepgramResponse.status}):`, errorText);
+    
+    // Atualizar status da palestra para erro
+    await supabase
+      .from('scribia_palestras')
+      .update({ 
+        status: 'erro',
+        transcricao: `Erro na transcrição: Deepgram retornou status ${deepgramResponse.status}`
+      })
+      .eq('id', palestra_id);
+    
+    throw new Error(`Erro na transcrição (Deepgram ${deepgramResponse.status}): ${errorText.substring(0, 200)}`);
   }
 
   const result = await deepgramResponse.json();
