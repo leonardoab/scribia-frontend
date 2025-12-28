@@ -1,8 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
-const SUPABASE_URL = "https://apnfbdkerddhkkzqstmp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwbmZiZGtlcmRkaGtrenFzdG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0ODg2NTUsImV4cCI6MjA3MDA2NDY1NX0.CVcB4Rr8KD0xE-70DcLH4ezuyPuscoulIrQpt2lY3D4";
 
 /**
  * Calcula tempo estimado de processamento baseado no tamanho do arquivo
@@ -76,37 +74,29 @@ export async function uploadAudioToTranscribe(
 
   // 3. Chamar edge function com URL (não arquivo)
   console.log('🎙️ Iniciando transcrição via Deepgram (URL remota)...');
-  
-  const response = await fetch(
-    `${SUPABASE_URL}/functions/v1/scribia-transcribe`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        audio_url: signedUrlData.signedUrl,
-        palestra_id: palestraId,
-        user_id: userId,
-      }),
-    }
-  );
-  
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
-    const errorMessage = errorData?.error || errorData?.message || `HTTP ${response.status}`;
-    console.error('❌ Erro na transcrição:', response.status, errorMessage, errorData);
-    throw new Error(`Erro na transcrição: ${errorMessage}`);
+
+  const { data: result, error: invokeError } = await supabase.functions.invoke<{
+    success?: boolean;
+    message?: string;
+    transcription_url?: string;
+  }>('scribia-transcribe', {
+    body: {
+      audio_url: signedUrlData.signedUrl,
+      palestra_id: palestraId,
+      user_id: userId,
+    },
+  });
+
+  if (invokeError) {
+    console.error('❌ Erro na transcrição:', invokeError);
+    throw new Error(`Erro na transcrição: ${invokeError.message || 'Falha ao iniciar transcrição'}`);
   }
-  
-  const result = await response.json();
-  
+
   if (onProgress) onProgress(100);
   console.log('✅ Transcrição iniciada com sucesso');
-  
-  return { 
-    success: true, 
-    message: result.message || 'Transcrição em andamento' 
+
+  return {
+    success: true,
+    message: result?.message || 'Transcrição em andamento',
   };
 }
