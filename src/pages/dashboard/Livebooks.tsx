@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { useCustomAuth } from '@/hooks/useCustomAuth';
+import { livebooksApi } from '@/services/api';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,7 +37,7 @@ interface Livebook {
 const Livebooks = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useCustomAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'todos' | 'com-evento' | 'sem-evento'>('todos');
   const [livebooks, setLivebooks] = useState<any[]>([]);
@@ -61,30 +61,21 @@ const Livebooks = () => {
     const fetchLivebooks = async () => {
       try {
         setLoading(true);
-        console.log("Fetching livebooks for user:", user.id);
+        console.log("Fetching livebooks for user:", user.profile.id);
         
-        // Usar função RPC que bypassa RLS (compatível com auth customizado)
-        const { data, error } = await supabase.rpc('scribia_get_livebooks', {
-          p_usuario_id: user.id,
-          p_evento_id: null
-        });
-
-        if (error) {
-          console.error("RPC error:", error);
-          throw error;
-        }
+        const response = await livebooksApi.list();
+        const data = response.data;
+        const livebooksData = Array.isArray(data) ? data : [];
         
-        console.log("RPC response:", data);
-        const result = data as unknown as { success: boolean; livebooks: any[] };
-        const livebooksData = result?.livebooks || [];
         console.log("Livebooks loaded:", livebooksData.length);
         setLivebooks(livebooksData);
       } catch (err: any) {
         console.error('Erro ao buscar livebooks:', err);
-        setError(err.message);
+        setError(err.response?.data?.message || err.message);
+        setLivebooks([]);
         toast({
           title: "Erro ao carregar livebooks",
-          description: err.message,
+          description: err.response?.data?.message || err.message,
           variant: "destructive",
         });
       } finally {
@@ -94,39 +85,11 @@ const Livebooks = () => {
     
     fetchLivebooks();
 
-    // Configurar subscription de realtime
-    const channel = supabase
-      .channel('livebooks-page-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'scribia_livebooks',
-          filter: `usuario_id=eq.${user.id}`,
-        },
-        (payload) => {
-          console.log('Realtime update:', payload);
-          fetchLivebooks();
-          
-          // Notificar quando livebook for concluído
-          if (payload.eventType === 'UPDATE' && payload.new.status === 'concluido') {
-            toast({
-              title: "✅ Livebook concluído!",
-              description: "Seu livebook está pronto para download.",
-            });
-          } else if (payload.eventType === 'INSERT') {
-            toast({
-              title: "🆕 Novo livebook em processamento",
-              description: "Aguarde enquanto geramos seu conteúdo.",
-            });
-          }
-        }
-      )
-      .subscribe();
+    // Polling para atualizar dados a cada 30 segundos
+    const interval = setInterval(fetchLivebooks, 30000);
 
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [user, authLoading, toast]);
 

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { dashboardApi } from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { QuickLivebookModal } from '@/components/dashboard/QuickLivebookModal';
 import { LivebookProgress } from '@/components/dashboard/LivebookProgress';
@@ -75,21 +75,13 @@ const Dashboard = () => {
 
     const fetchStats = async () => {
       try {
-        console.log('📊 Dashboard: Buscando estatísticas via RPC...');
+        console.log('📊 Dashboard: Buscando estatísticas via API...');
         
-        // Chamar função RPC que bypassa RLS de forma segura
-        const { data, error } = await supabase.rpc('scribia_get_dashboard_stats', {
-          p_user_id: userId
-        });
+        const response = await dashboardApi.getInicio();
+        const statsData = response.data;
 
-        if (error) {
-          console.error('❌ Erro RPC:', error);
-          throw error;
-        }
-
-        console.log('✅ Dashboard: Estatísticas carregadas:', data);
+        console.log('✅ Dashboard: Estatísticas carregadas:', statsData);
         
-        const statsData = data as any;
         setStats({
           totalEventos: statsData.total_eventos || 0,
           totalPalestras: statsData.total_palestras || 0,
@@ -98,11 +90,11 @@ const Dashboard = () => {
           eventos_recentes: statsData.eventos_recentes || [],
           livebooks_recentes: statsData.livebooks_recentes || []
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Dashboard: Erro ao buscar estatísticas:', error);
         toast({
           title: "Erro ao carregar estatísticas",
-          description: "Não foi possível carregar os dados do dashboard.",
+          description: error.response?.data?.message || "Não foi possível carregar os dados do dashboard.",
           variant: "destructive"
         });
       }
@@ -110,70 +102,11 @@ const Dashboard = () => {
     
     fetchStats();
 
-    // Configurar subscriptions de realtime
-    const livebooksChannel = supabase
-      .channel('dashboard-livebooks-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'scribia_livebooks',
-          filter: `usuario_id=eq.${userId}`,
-        },
-        (payload) => {
-          console.log('Livebook atualizado:', payload);
-          fetchStats();
-          
-          // Notificar quando livebook for concluído
-          if (payload.eventType === 'UPDATE' && payload.new.status === 'concluido') {
-            toast({
-              title: "✅ Livebook concluído!",
-              description: "Seu livebook está pronto para download.",
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    const eventosChannel = supabase
-      .channel('dashboard-eventos-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'scribia_eventos',
-          filter: `usuario_id=eq.${userId}`,
-        },
-        () => {
-          console.log('Evento atualizado');
-          fetchStats();
-        }
-      )
-      .subscribe();
-
-    const palestrasChannel = supabase
-      .channel('dashboard-palestras-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'scribia_palestras',
-          filter: `usuario_id=eq.${userId}`,
-        },
-        () => {
-          console.log('Palestra atualizada');
-          fetchStats();
-        }
-      )
-      .subscribe();
+    // Polling para atualizar dados a cada 30 segundos
+    const interval = setInterval(fetchStats, 30000);
 
     return () => {
-      supabase.removeChannel(livebooksChannel);
-      supabase.removeChannel(eventosChannel);
-      supabase.removeChannel(palestrasChannel);
+      clearInterval(interval);
     };
   }, [customUser, toast]);
 

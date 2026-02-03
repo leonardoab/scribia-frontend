@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useCustomAuth } from "@/hooks/useCustomAuth";
+import { eventosApi } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 import { EventList } from "@/components/dashboard/EventList";
 import { EventForm } from "@/components/dashboard/EventForm";
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const EventosDashboard = () => {
-  const { user, profile, isAuthenticated } = useAuth();
+  const { user } = useCustomAuth();
   const { toast } = useToast();
   
   const [eventos, setEventos] = useState<Evento[]>([]);
@@ -31,30 +31,23 @@ const EventosDashboard = () => {
   const [eventoToDelete, setEventoToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (user) {
       fetchEventos();
     }
-  }, [isAuthenticated, user]);
+  }, [user]);
 
   const fetchEventos = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.rpc("scribia_get_eventos" as any, {
-        p_usuario_id: user!.id,
-      });
-
-      if (error) throw error;
-      
-      const result = data as any;
-      if (result?.success) {
-        setEventos(result.eventos || []);
-      } else {
-        throw new Error(result?.error || "Erro ao carregar eventos");
-      }
+      const response = await eventosApi.list();
+      const data = response.data;
+      setEventos(Array.isArray(data) ? data : []);
     } catch (error: any) {
+      console.error('Erro ao buscar eventos:', error);
+      setEventos([]);
       toast({
         title: "Erro ao carregar eventos",
-        description: error.message,
+        description: error.response?.data?.message || error.message,
         variant: "destructive",
       });
     } finally {
@@ -67,50 +60,13 @@ const EventosDashboard = () => {
       setFormLoading(true);
 
       if (editingEvento) {
-        // Update
-        const { data, error } = await supabase.rpc("scribia_update_evento" as any, {
-          p_evento_id: editingEvento.id,
-          p_usuario_id: user!.id,
-          p_nome_evento: formData.nome_evento,
-          p_data_inicio: formData.data_inicio || null,
-          p_data_fim: formData.data_fim || null,
-          p_cidade: formData.cidade || null,
-          p_estado: formData.estado || null,
-          p_pais: formData.pais || null,
-          p_observacoes: formData.observacoes || null,
-        });
-
-        if (error) throw error;
-        
-        const result = data as any;
-        if (!result?.success) {
-          throw new Error(result?.error || "Erro ao atualizar evento");
-        }
-
+        await eventosApi.update(editingEvento.id, formData);
         toast({
           title: "✅ Evento atualizado!",
           description: "As alterações foram salvas com sucesso.",
         });
       } else {
-        // Create
-        const { data, error } = await supabase.rpc("scribia_create_evento" as any, {
-          p_usuario_id: user!.id,
-          p_nome_evento: formData.nome_evento,
-          p_data_inicio: formData.data_inicio || null,
-          p_data_fim: formData.data_fim || null,
-          p_cidade: formData.cidade || null,
-          p_estado: formData.estado || null,
-          p_pais: formData.pais || null,
-          p_observacoes: formData.observacoes || null,
-        });
-
-        if (error) throw error;
-        
-        const result = data as any;
-        if (!result?.success) {
-          throw new Error(result?.error || "Erro ao criar evento");
-        }
-
+        await eventosApi.create(formData);
         toast({
           title: "✅ Evento criado com sucesso!",
           description: "Seu evento foi adicionado.",
@@ -123,7 +79,7 @@ const EventosDashboard = () => {
     } catch (error: any) {
       toast({
         title: "Erro ao salvar evento",
-        description: error.message,
+        description: error.response?.data?.message || error.message,
         variant: "destructive",
       });
     } finally {
@@ -145,17 +101,7 @@ const EventosDashboard = () => {
     if (!eventoToDelete) return;
 
     try {
-      const { data, error } = await supabase.rpc("scribia_delete_evento" as any, {
-        p_evento_id: eventoToDelete,
-        p_usuario_id: user!.id,
-      });
-
-      if (error) throw error;
-      
-      const result = data as any;
-      if (!result?.success) {
-        throw new Error(result?.error || "Erro ao excluir evento");
-      }
+      await eventosApi.delete(eventoToDelete);
 
       toast({
         title: "🗑️ Evento excluído com sucesso!",
@@ -166,7 +112,7 @@ const EventosDashboard = () => {
     } catch (error: any) {
       toast({
         title: "Erro ao excluir evento",
-        description: error.message,
+        description: error.response?.data?.message || error.message,
         variant: "destructive",
       });
     } finally {

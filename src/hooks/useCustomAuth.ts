@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "@/services/api";
+import { authApi, configuracoesApi } from "@/services/api";
 
 interface UserProfile {
   id: string;
@@ -163,6 +163,38 @@ export function useCustomAuth() {
     }
   };
 
+  const updateProfile = async (nivelPreferido: string, formatoPreferido: string) => {
+    try {
+      const response = await configuracoesApi.updatePreferencias({
+        nivel_preferido: nivelPreferido,
+        formato_preferido: formatoPreferido,
+        perfil_definido: true
+      });
+
+      if (user) {
+        const updatedUser = {
+          ...user,
+          profile: {
+            ...user.profile,
+            nivel_preferido: nivelPreferido,
+            formato_preferido: formatoPreferido,
+            perfil_definido: true
+          }
+        };
+        setUser(updatedUser);
+        localStorage.setItem('scribia_user', JSON.stringify(updatedUser));
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Erro ao atualizar perfil:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Erro ao atualizar perfil' 
+      };
+    }
+  };
+
   return {
     user,
     userType,
@@ -171,5 +203,6 @@ export function useCustomAuth() {
     signup,
     logout,
     setUserRoleAndEvent,
+    updateProfile,
   };
 }
