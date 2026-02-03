@@ -40,8 +40,10 @@ const EventosDashboard = () => {
     try {
       setLoading(true);
       const response = await eventosApi.list();
-      const data = response.data;
-      setEventos(Array.isArray(data) ? data : []);
+      // Backend retorna { statusCode, message, data: { perfil, total, eventos } }
+      const backendData = response.data.data || response.data;
+      const eventosData = backendData.eventos || backendData;
+      setEventos(Array.isArray(eventosData) ? eventosData : []);
     } catch (error: any) {
       console.error('Erro ao buscar eventos:', error);
       setEventos([]);
