@@ -11,6 +11,7 @@ import DashboardHome from '@/pages/dashboard/Dashboard';
 import EventosDashboard from '@/pages/dashboard/EventosDashboard';
 import Livebooks from '@/pages/dashboard/Livebooks';
 import Bia from '@/pages/dashboard/Bia';
+import Tutor from '@/pages/dashboard/Tutor';
 import GerarLivebook from '@/pages/dashboard/GerarLivebook';
 import Ajuda from '@/pages/dashboard/Ajuda';
 import Configuracoes from '@/pages/dashboard/Configuracoes';
@@ -84,6 +85,7 @@ const DashboardLayout = () => {
             <Route path="palestras/:palestraId/livebooks/novo" element={<LivebookForm />} />
             <Route path="gerar-livebook" element={<GerarLivebook />} />
             <Route path="bia" element={<Bia />} />
+            <Route path="tutor" element={<Tutor />} />
             <Route path="livebooks" element={<Livebooks />} />
             <Route path="livebooks/:livebookId" element={<LivebookDetalhe />} />
             <Route path="ajuda" element={<Ajuda />} />

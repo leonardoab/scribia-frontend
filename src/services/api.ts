@@ -114,3 +114,11 @@ export const notificacoesApi = {
   markAsRead: (id: string) => api.put(`/notificacoes/${id}/marcar-lida`),
   markAllAsRead: () => api.put('/notificacoes/marcar-todas-lidas'),
 };
+
+// IA (Bia e Tutor)
+export const iaApi = {
+  iniciar: (tipo_ia: 'bia' | 'tutor') => api.post('/ia/iniciar', { tipo_ia }),
+  responder: (interacaoId: string, conteudo: string) => api.post(`/ia/${interacaoId}/responder`, { conteudo }),
+  historico: (interacaoId: string) => api.get(`/ia/${interacaoId}/historico`),
+};
+
