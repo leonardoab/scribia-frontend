@@ -1,7 +1,7 @@
 export type NivelConhecimento = 'junior' | 'pleno' | 'senior';
 export type FormatoPalestra = 'completo' | 'compacto';
 export type OrigemClassificacao = 'auto' | 'manual';
-export type StatusPalestra = 'aguardando' | 'processando' | 'concluido' | 'erro';
+export type StatusPalestra = 'planejada' | 'em_andamento' | 'concluida' | 'cancelada';
 
 export interface Palestra {
   id: string;

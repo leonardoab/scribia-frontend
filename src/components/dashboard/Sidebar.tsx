@@ -27,7 +27,6 @@ const Sidebar = ({ className, onNavigate }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: 'Início', path: '/dashboard' },
     { icon: Calendar, label: 'Meus Eventos', path: '/dashboard/eventos' },
-    { icon: Mic, label: 'Minhas Palestras', path: '/dashboard/palestras' },
     { icon: BookOpen, label: 'Gerar Livebook', path: '/dashboard/gerar-livebook' },
     { icon: BookOpen, label: 'Meus Livebooks', path: '/dashboard/livebooks' },
     { icon: Brain, label: 'Bia - Análise de Perfil', path: '/dashboard/bia' },

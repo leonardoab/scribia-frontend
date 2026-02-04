@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { AudioUploader } from "@/components/audio/AudioUploader";
+import { useCustomAuth } from "@/hooks/useCustomAuth";
 import {
   NivelConhecimento,
   FormatoPalestra,
@@ -24,6 +25,7 @@ const PalestraForm = () => {
   const { eventoId } = useParams<{ eventoId: string }>();
   const navigate = useNavigate();
   const { toast: toastHook } = useToast();
+  const { user } = useCustomAuth();
 
   const handleDownload = async (url: string, filename: string) => {
     try {
@@ -48,15 +50,12 @@ const PalestraForm = () => {
   const [formData, setFormData] = useState({
     titulo: "",
     palestrante: "",
+    data_hora_inicio: "",
+    informacoes_adicionais: "",
     tags_tema: [] as string[],
-    nivel_escolhido: null as NivelConhecimento | null,
-    formato_escolhido: null as FormatoPalestra | null,
   });
 
   const [currentTag, setCurrentTag] = useState("");
-  const [step, setStep] = useState<"basic" | "perfil" | "upload" | "completed">("basic");
-  const [uploadMode, setUploadMode] = useState<'audio' | 'text'>('audio');
-  const [palestraId, setPalestraId] = useState<string | null>(null);
   const [preparingUpload, setPreparingUpload] = useState(false);
   const [transcricao, setTranscricao] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -114,7 +113,7 @@ const PalestraForm = () => {
     });
   };
 
-  const handleBasicInfoSubmit = () => {
+  const handleBasicInfoSubmit = async () => {
     if (!formData.titulo.trim()) {
       toastHook({
         title: "Campo obrigatório",
@@ -123,72 +122,56 @@ const PalestraForm = () => {
       });
       return;
     }
-    setStep("perfil");
-  };
+    
+    setPreparingUpload(true);
+    const palestraIdNovo = await criarPalestra();
+    setPreparingUpload(false);
 
-  const handlePerfilSubmit = () => {
-    if (!formData.nivel_escolhido) {
+    console.log('ID da palestra criada:', palestraIdNovo);
+
+    if (palestraIdNovo) {
       toastHook({
-        title: "Escolha um nível",
-        description: "Selecione o nível de conhecimento do público.",
-        variant: "destructive",
+        title: 'Palestra criada com sucesso! ✅',
+        description: 'Redirecionando para a lista de palestras...'
       });
-      return;
+      
+      setTimeout(() => {
+        console.log('Navegando para:', `/dashboard/eventos/${eventoId}/palestras`);
+        navigate(`/dashboard/eventos/${eventoId}/palestras`);
+      }, 1000);
     }
-    if (!formData.formato_escolhido) {
-      toastHook({
-        title: "Escolha um formato",
-        description: "Selecione o formato desejado para o conteúdo.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setStep("upload");
   };
 
   // Criar palestra
   const criarPalestra = async () => {
     try {
-      const userId = localStorage.getItem('scribia_user_id');
-      if (!userId) {
+      if (!user?.profile?.id) {
         throw new Error('Usuário não autenticado');
       }
-      
-      const webhookDestino = getWebhookDestino(
-        formData.nivel_escolhido!,
-        formData.formato_escolhido!
-      );
 
-      const { data, error } = await supabase.rpc('scribia_create_palestra' as any, {
-        p_usuario_id: userId,
-        p_evento_id: eventoId,
-        p_titulo: formData.titulo,
-        p_palestrante: formData.palestrante || null,
-        p_tags_tema: formData.tags_tema.length > 0 ? formData.tags_tema : null,
-        p_nivel_escolhido: formData.nivel_escolhido,
-        p_formato_escolhido: formData.formato_escolhido,
-        p_origem_classificacao: "manual",
-        p_confidence: null,
-        p_webhook_destino: webhookDestino,
-        p_status: 'aguardando',
-        p_audio_urls: null,
-        p_slides_url: null,
+      const response = await fetch('http://localhost:3000/api/v1/palestras', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          evento_id: eventoId,
+          titulo: formData.titulo,
+          palestrante: formData.palestrante || null,
+          data_hora_inicio: formData.data_hora_inicio || null,
+          informacoes_adicionais: formData.informacoes_adicionais || null,
+        })
       });
-      
-      if (error) throw error;
-      if (!(data as any)?.success) {
-        throw new Error((data as any)?.error || 'Erro ao criar palestra');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao criar palestra');
       }
-      
-      const palestraIdNovo = (data as any).palestra_id;
-      setPalestraId(palestraIdNovo);
-      
-      toastHook({
-        title: 'Preparado para upload! ✅',
-        description: 'Agora você pode fazer upload do áudio'
-      });
-      
-      return palestraIdNovo;
+
+      const data = await response.json();
+      console.log('Palestra criada:', data);
+      return data.id;
     } catch (error: any) {
       console.error('Erro ao criar palestra:', error);
       toastHook({
@@ -458,15 +441,14 @@ const PalestraForm = () => {
           Voltar para Palestras
         </Button>
 
-        {/* Step 1: Informações Básicas */}
-        {step === "basic" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Nova Palestra</CardTitle>
-              <CardDescription>Preencha as informações básicas</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
+        {/* Formulário de Nova Palestra */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Nova Palestra</CardTitle>
+            <CardDescription>Preencha as informações básicas</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
                 <Label htmlFor="titulo">Título da Palestra *</Label>
                 <Input
                   id="titulo"
@@ -483,6 +465,27 @@ const PalestraForm = () => {
                   value={formData.palestrante}
                   onChange={(e) => setFormData({ ...formData, palestrante: e.target.value })}
                   placeholder="Ex: João Silva"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="data_hora_inicio">Data e Hora de Início</Label>
+                <Input
+                  id="data_hora_inicio"
+                  type="datetime-local"
+                  value={formData.data_hora_inicio}
+                  onChange={(e) => setFormData({ ...formData, data_hora_inicio: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="informacoes_adicionais">Informações Adicionais</Label>
+                <Textarea
+                  id="informacoes_adicionais"
+                  value={formData.informacoes_adicionais}
+                  onChange={(e) => setFormData({ ...formData, informacoes_adicionais: e.target.value })}
+                  placeholder="Detalhes sobre a palestra, local, etc."
+                  rows={3}
                 />
               </div>
 
@@ -519,364 +522,19 @@ const PalestraForm = () => {
               <Button 
                 onClick={handleBasicInfoSubmit} 
                 className="w-full"
+                disabled={preparingUpload}
               >
-                Continuar
+                {preparingUpload ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Criando palestra...
+                  </>
+                ) : (
+                  'Criar Palestra'
+                )}
               </Button>
             </CardContent>
           </Card>
-        )}
-
-        {/* Step 2: Perfil (Nível + Formato) */}
-        {step === "perfil" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Defina o Perfil do Livebook</CardTitle>
-              <CardDescription>Escolha o nível e formato do conteúdo</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Nível de Conhecimento */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Qual o seu nivel de conhecimento do assunto?</Label>
-                <RadioGroup
-                  value={formData.nivel_escolhido || ""}
-                  onValueChange={(value) => {
-                    setFormData({ 
-                      ...formData, 
-                      nivel_escolhido: value as NivelConhecimento,
-                    });
-                  }}
-                >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="junior" id="junior" />
-                    <Label htmlFor="junior" className="cursor-pointer flex-1">
-                      <span className="font-medium">🌱 Júnior</span>
-                      <p className="text-xs text-muted-foreground">Iniciante no tema</p>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="pleno" id="pleno" />
-                    <Label htmlFor="pleno" className="cursor-pointer flex-1">
-                      <span className="font-medium">🎯 Pleno</span>
-                      <p className="text-xs text-muted-foreground">Conhecimento intermediário</p>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="senior" id="senior" />
-                    <Label htmlFor="senior" className="cursor-pointer flex-1">
-                      <span className="font-medium">🚀 Sênior</span>
-                      <p className="text-xs text-muted-foreground">Conhecimento avançado</p>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {/* Formato do Conteúdo */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Como você prefere o seu Livebook?</Label>
-                <p className="text-sm text-muted-foreground">
-                  Você prefere textos mais longos e aprofundados ou uma versão resumida?
-                </p>
-                <RadioGroup
-                  value={formData.formato_escolhido || ""}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, formato_escolhido: value as FormatoPalestra })
-                  }
-                >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="completo" id="completo" />
-                    <Label htmlFor="completo" className="cursor-pointer flex-1">
-                      <span className="font-medium">📚 Completo</span>
-                      <p className="text-xs text-muted-foreground">Textos longos e aprofundados</p>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="compacto" id="compacto" />
-                    <Label htmlFor="compacto" className="cursor-pointer flex-1">
-                      <span className="font-medium">⚡ Compacto</span>
-                      <p className="text-xs text-muted-foreground">Versão resumida e direta</p>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep("basic")} className="flex-1">
-                  Voltar
-                </Button>
-                <Button onClick={handlePerfilSubmit} className="flex-1">
-                  Continuar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 3: Upload - Layout 2 colunas similar ao GerarLivebook */}
-        {step === "upload" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Coluna Esquerda: Inputs */}
-            <div className="space-y-6">
-              {/* Card com informações readonly */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
-                    Informações do Livebook
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Título</Label>
-                    <p className="font-medium">{formData.titulo}</p>
-                  </div>
-                  {formData.palestrante && (
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Palestrante</Label>
-                      <p className="font-medium">{formData.palestrante}</p>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3 pt-2">
-                    <Badge variant={getNivelVariant(formData.nivel_escolhido)}>
-                      {formatNivel(formData.nivel_escolhido)}
-                    </Badge>
-                    <Badge variant="outline">
-                      {formatFormato(formData.formato_escolhido)}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card com Tabs de Upload */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Conteúdo da Palestra</CardTitle>
-                  <CardDescription>
-                    Escolha como deseja fornecer o conteúdo
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Tabs value={uploadMode} onValueChange={(v) => setUploadMode(v as 'audio' | 'text')}>
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="audio">Upload de Áudio</TabsTrigger>
-                      <TabsTrigger value="text">Transcrição Manual</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="audio" className="space-y-4">
-                      <div className="space-y-4">
-                        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                          <h4 className="font-medium text-sm">📝 Como funciona:</h4>
-                          <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                            <li>Clique em "Iniciar Upload de Áudio"</li>
-                            <li>Selecione o arquivo de áudio da palestra</li>
-                            <li>Aguarde a transcrição automática</li>
-                            <li>Seu Livebook será gerado automaticamente</li>
-                          </ol>
-                        </div>
-
-                        {!palestraId ? (
-                          <Button 
-                            onClick={handlePrepareAudioUpload}
-                            disabled={preparingUpload}
-                            className="w-full"
-                          >
-                            {preparingUpload ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Preparando...
-                              </>
-                            ) : (
-                              'Iniciar Upload de Áudio'
-                            )}
-                          </Button>
-                        ) : (
-                          <AudioUploader
-                            palestraId={palestraId}
-                            onUploadComplete={handleAudioUploadComplete}
-                          />
-                        )}
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="text" className="space-y-4">
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="textFile" className="text-sm">
-                            Ou faça upload de arquivo .txt
-                          </Label>
-                          <Input
-                            id="textFile"
-                            type="file"
-                            accept=".txt"
-                            onChange={handleFileUpload}
-                            className="mt-2"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="transcricao">Cole ou digite a transcrição</Label>
-                          <Textarea
-                            id="transcricao"
-                            value={transcricao}
-                            onChange={(e) => setTranscricao(e.target.value)}
-                            placeholder="Cole aqui a transcrição da palestra..."
-                            className="min-h-[200px] mt-2"
-                          />
-                        </div>
-
-                        <Button 
-                          onClick={handleGenerateFromText}
-                          disabled={isGenerating || !transcricao.trim()}
-                          className="w-full"
-                        >
-                          {isGenerating ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Gerando Livebook...
-                            </>
-                          ) : (
-                            'Gerar Livebook'
-                          )}
-                        </Button>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-
-              <Button 
-                variant="outline" 
-                onClick={() => setStep("perfil")}
-                className="w-full"
-              >
-                Voltar
-              </Button>
-            </div>
-
-            {/* Coluna Direita: Output/Status */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Livebook Gerado</CardTitle>
-                  <CardDescription>
-                    {processing ? 'Processando seu conteúdo...' : 'Aguardando processamento'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {processing ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                        <span className="text-sm font-medium">Gerando seu Livebook...</span>
-                      </div>
-                      <Progress value={progress} className="h-2" />
-                      <div className="text-sm text-muted-foreground space-y-2">
-                        <p>📝 Transcrevendo áudio com IA...</p>
-                        <p>📚 Gerando Livebook personalizado...</p>
-                        <p className="text-xs">
-                          Isso pode levar alguns minutos dependendo do tamanho do áudio.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center text-muted-foreground py-8">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                      <p className="text-sm">Seu Livebook aparecerá aqui após o processamento</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* View Completed */}
-        {step === "completed" && livebookData && (
-          <div className="space-y-6">
-            <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                  <CheckCircle className="h-6 w-6" />
-                  Livebook Gerado com Sucesso!
-                </CardTitle>
-                <CardDescription>
-                  <strong>{formData.titulo}</strong>
-                  {formData.palestrante && <><br />Palestrante: {formData.palestrante}</>}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
-                {livebookData.pdf_url && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => handleDownload(livebookData.pdf_url, `${formData.titulo}.pdf`)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download PDF
-                  </Button>
-                )}
-                {livebookData.docx_url && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => handleDownload(livebookData.docx_url, `${formData.titulo}.docx`)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download DOCX
-                  </Button>
-                )}
-                {livebookData.html_url && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => window.open(livebookData.html_url, '_blank')}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Ver HTML
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>📖 Preview do Livebook</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none bg-muted/50 rounded-lg p-6 border max-h-[600px] overflow-y-auto">
-                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-                    {livebookContent || 'Carregando conteúdo...'}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate(`/dashboard/eventos/${eventoId}/palestras`)}
-                className="flex-1"
-              >
-                Ver Todas as Palestras
-              </Button>
-              <Button 
-                onClick={() => {
-                  setStep('basic');
-                  setFormData({
-                    titulo: "",
-                    palestrante: "",
-                    tags_tema: [],
-                    nivel_escolhido: null,
-                    formato_escolhido: null,
-                  });
-                  setTranscricao('');
-                  setLivebookData(null);
-                  setLivebookContent('');
-                  setPalestraId(null);
-                }}
-                className="flex-1"
-              >
-                Criar Nova Palestra
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
   );
 };

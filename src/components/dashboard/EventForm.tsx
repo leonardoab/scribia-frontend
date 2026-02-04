@@ -35,10 +35,11 @@ export function EventForm({ open, onOpenChange, onSubmit, evento, loading }: Eve
 
   useEffect(() => {
     if (evento) {
+      console.log('Evento recebido:', evento);
       setFormData({
         nome_evento: evento.nome_evento,
-        data_inicio: evento.data_inicio || "",
-        data_fim: evento.data_fim || "",
+        data_inicio: evento.data_inicio ? evento.data_inicio.split('T')[0] : "",
+        data_fim: evento.data_fim ? evento.data_fim.split('T')[0] : "",
         formato_evento: evento.formato_evento || "",
         cidade: evento.cidade || "",
         estado: evento.estado || "",

@@ -36,11 +36,11 @@ const PalestrasList = () => {
   const [nomeEvento, setNomeEvento] = useState("");
 
   useEffect(() => {
-    if (eventoId && user) {
+    if (eventoId) {
       fetchEvento();
       fetchPalestras();
     }
-  }, [eventoId, user]);
+  }, [eventoId]);
 
   const fetchEvento = async () => {
     try {
@@ -65,29 +65,34 @@ const PalestrasList = () => {
 
   const fetchPalestras = async () => {
     try {
+      console.log('Buscando palestras do evento:', eventoId);
       setLoading(true);
-      const userId = localStorage.getItem('scribia_user_id');
-      if (!userId) {
+      const token = localStorage.getItem('auth_token');
+      console.log('Token:', token ? 'existe' : 'não existe');
+      
+      if (!token) {
         navigate('/login');
         return;
       }
 
-      const { data, error } = await supabase.rpc('scribia_get_palestras' as any, {
-        p_usuario_id: userId,
-        p_evento_id: eventoId,
+      const url = `http://localhost:3000/api/v1/eventos/${eventoId}/palestras`;
+      console.log('URL:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
-      if (error) throw error;
-      
-      if ((data as any)?.success) {
-        const palestrasData = (data as any).palestras || [];
-        setPalestras(palestrasData);
-        
-        // Buscar status dos livebooks para cada palestra
-        await fetchLivebookStatuses(palestrasData, userId);
-      } else {
-        throw new Error((data as any)?.error || 'Erro ao carregar palestras');
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar palestras');
       }
+
+      const palestrasData = await response.json();
+      console.log('Palestras recebidas:', palestrasData);
+      setPalestras(palestrasData.data || []);
     } catch (error: any) {
       toast({
         title: "Erro ao carregar palestras",
@@ -174,13 +179,13 @@ const PalestrasList = () => {
   };
 
   const getStatusBadge = (status: Palestra['status']) => {
-    const variants: Record<Palestra['status'], { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" }> = {
-      aguardando: { label: "Aguardando", variant: "outline" },
-      processando: { label: "Processando", variant: "secondary" },
-      concluido: { label: "Concluído", variant: "success" },
-      erro: { label: "Erro", variant: "destructive" },
+    const variants: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" }> = {
+      planejada: { label: "Planejada", variant: "outline" },
+      em_andamento: { label: "Em Andamento", variant: "secondary" },
+      concluida: { label: "Concluída", variant: "success" },
+      cancelada: { label: "Cancelada", variant: "destructive" },
     };
-    const config = variants[status];
+    const config = variants[status] || { label: status || "Desconhecido", variant: "default" };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
