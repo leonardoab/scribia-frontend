@@ -94,7 +94,6 @@ export async function uploadAudioToTranscribe(
         titulo: 'Livebook via Upload',
         palestrante: 'Não informado',
         status: 'planejada',
-        origem_classificacao: 'manual',
       }),
     });
     

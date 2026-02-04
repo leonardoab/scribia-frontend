@@ -66,13 +66,16 @@ const GerarLivebook = () => {
     const fetchUserProfile = async () => {
       if (!user?.profile?.id) return;
       try {
-        const { data, error } = await supabase
-          .from('scribia_usuarios')
-          .select('nivel_preferido, formato_preferido')
-          .eq('id', user.profile.id)
-          .single();
-        
-        if (error) throw error;
+        const response = await fetch(`http://localhost:3000/api/v1/usuarios/${user.profile.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Erro ao buscar perfil');
+
+        const responseData = await response.json();
+        const data = responseData.data || responseData;
         
         if (data?.nivel_preferido && data?.formato_preferido) {
           const perfil = `${data.nivel_preferido}-${data.formato_preferido}`;
@@ -96,29 +99,27 @@ const GerarLivebook = () => {
         throw new Error('Por favor, preencha o título antes de continuar');
       }
       
-      // Extrair nivel e formato do perfil do usuário
-      const [nivel, formato] = userPerfil ? userPerfil.split('-') : [null, null];
-      
-      const { data, error } = await supabase.rpc('scribia_create_palestra', {
-        p_usuario_id: user.profile.id,
-        p_evento_id: null,
-        p_titulo: titulo || 'Palestra sem título',
-        p_palestrante: palestrante || 'Não informado',
-        p_status: 'aguardando',
-        p_nivel_escolhido: nivel,
-        p_formato_escolhido: formato,
-        p_origem_classificacao: 'manual'
+      const response = await fetch('http://localhost:3000/api/v1/palestras', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          titulo: titulo || 'Palestra sem título',
+          palestrante: palestrante || 'Não informado',
+          status: 'planejada',
+        })
       });
-      
-      if (error) throw error;
-      
-      const result = data as { success: boolean; error?: string; palestra_id?: string };
-      
-      if (!result?.success) {
-        throw new Error(result?.error || 'Erro ao criar palestra');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao criar palestra');
       }
-      
-      const palestraIdNovo = result.palestra_id;
+
+      const responseData = await response.json();
+      const palestra = responseData.data || responseData;
+      const palestraIdNovo = palestra.id;
       setPalestraId(palestraIdNovo);
       
       toast({
@@ -213,43 +214,39 @@ const GerarLivebook = () => {
     setLivebookGerado('');
     
     try {
-      const metadados = {
-        titulo: titulo || undefined,
-        palestrante: palestrante || undefined
-      };
-      
-      const { data, error } = await supabase.functions.invoke('generate-livebook', {
-        body: {
-          transcricao: textoParaGerar,
-          perfil: userPerfil,
-          metadados,
-          palestraId: currentPalestraId,
-          usuarioId: user?.profile?.id
-        }
+      const response = await fetch('http://localhost:3000/api/v1/livebooks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          palestra_id: currentPalestraId,
+          tipo_resumo: userPerfil.includes('compacto') ? 'executivo' : 'completo',
+        })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao gerar livebook');
+      }
+
+      const responseData = await response.json();
+      const livebook = responseData.data || responseData;
       
-      if (error) throw error;
-      if (data?.error) {
-        throw new Error(data.error);
-      }
-      
-      setLivebookGerado(data.livebook);
-      
-      // Armazenar URLs e ID do livebook
-      if (data.pdfUrl) {
-        setPdfUrl(data.pdfUrl);
-      }
-      if (data.txtUrl) {
-        setTxtUrl(data.txtUrl);
-      }
-      if (data.livebookId) {
-        setLivebookId(data.livebookId);
-      }
+      setLivebookGerado('Livebook gerado com sucesso! Verifique em "Meus Livebooks".');
+      setLivebookId(livebook.id);
 
       toast({
         title: "Livebook gerado e salvo com sucesso! ✅",
         description: "Seu Livebook está disponível em 'Meus Livebooks'"
       });
+
+      // Limpar formulário
+      setTranscricao('');
+      setTitulo('');
+      setPalestrante('');
+      setPalestraId(null);
 
     } catch (error: any) {
       console.error('Erro ao gerar Livebook:', error);
