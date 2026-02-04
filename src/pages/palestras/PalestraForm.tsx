@@ -169,9 +169,13 @@ const PalestraForm = () => {
         throw new Error(errorData.message || 'Erro ao criar palestra');
       }
 
-      const data = await response.json();
-      console.log('Palestra criada:', data);
-      return data.id;
+      const responseData = await response.json();
+      console.log('Resposta completa:', responseData);
+      
+      // Backend retorna {statusCode, message, data}
+      const palestra = responseData.data || responseData;
+      console.log('Palestra criada:', palestra);
+      return palestra.id;
     } catch (error: any) {
       console.error('Erro ao criar palestra:', error);
       toastHook({

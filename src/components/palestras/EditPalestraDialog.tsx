@@ -14,10 +14,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Palestra, NivelConhecimento, FormatoPalestra, getWebhookDestino } from "@/types/palestra";
-import { AudioUploader } from "@/components/audio/AudioUploader";
+import { Palestra } from "@/types/palestra";
+import { useCustomAuth } from "@/hooks/useCustomAuth";
 
 interface EditPalestraDialogProps {
   open: boolean;
@@ -27,43 +26,38 @@ interface EditPalestraDialogProps {
   livebookStatus?: string | null;
 }
 
-export function EditPalestraDialog({ 
+export function EditPalestraDialog({
   open, 
   onOpenChange, 
   palestra, 
   onSuccess,
   livebookStatus 
 }: EditPalestraDialogProps) {
+  const { user } = useCustomAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     titulo: palestra.titulo,
     palestrante: palestra.palestrante || "",
+    data_hora_inicio: palestra.data_hora_inicio || "",
+    informacoes_adicionais: palestra.informacoes_adicionais || "",
     tags_tema: palestra.tags_tema || [],
-    nivel_escolhido: palestra.nivel_escolhido,
-    formato_escolhido: palestra.formato_escolhido,
   });
   const [currentTag, setCurrentTag] = useState("");
-  const [showAudioUpload, setShowAudioUpload] = useState(false);
-  const [audioUploaded, setAudioUploaded] = useState(false);
 
   // Determinar permissões de edição baseadas no status
-  const canEditBasicInfo = palestra.status === 'aguardando' || palestra.status === 'erro' || livebookStatus === 'concluido';
-  const canEditNivelFormato = palestra.status === 'aguardando' || palestra.status === 'erro';
-  const canReuploadAudio = palestra.status === 'aguardando' || palestra.status === 'erro';
-  const isProcessing = palestra.status === 'processando';
+  const canEditBasicInfo = palestra.status === 'planejada' || palestra.status === 'cancelada';
+  const isProcessing = palestra.status === 'em_andamento';
 
   // Resetar form quando palestra mudar
   useEffect(() => {
     setFormData({
       titulo: palestra.titulo,
       palestrante: palestra.palestrante || "",
+      data_hora_inicio: palestra.data_hora_inicio ? palestra.data_hora_inicio.split('T')[0] + 'T' + palestra.data_hora_inicio.split('T')[1].substring(0,5) : "",
+      informacoes_adicionais: palestra.informacoes_adicionais || "",
       tags_tema: palestra.tags_tema || [],
-      nivel_escolhido: palestra.nivel_escolhido,
-      formato_escolhido: palestra.formato_escolhido,
     });
     setCurrentTag("");
-    setShowAudioUpload(false);
-    setAudioUploaded(false);
   }, [palestra]);
 
   const handleAddTag = () => {
@@ -83,73 +77,43 @@ export function EditPalestraDialog({
     });
   };
 
-  const handleAudioUploadComplete = async (transcricao: string) => {
-    setAudioUploaded(true);
-    setShowAudioUpload(false);
-    toast.success("Áudio carregado! O livebook será gerado automaticamente.");
-    onSuccess();
-    onOpenChange(false);
-  };
-
   const handleSubmit = async () => {
     if (!formData.titulo.trim()) {
       toast.error("O título é obrigatório");
       return;
     }
 
-    // Se vai fazer reprocessamento, valida nível e formato
-    if (canEditNivelFormato && showAudioUpload) {
-      if (!formData.nivel_escolhido) {
-        toast.error("Selecione o nível de conhecimento");
-        return;
-      }
-      if (!formData.formato_escolhido) {
-        toast.error("Selecione o formato");
-        return;
-      }
-    }
-
     try {
       setLoading(true);
       
-      const userId = localStorage.getItem('scribia_user_id');
-      if (!userId) {
+      if (!user?.profile?.id) {
         toast.error("Usuário não autenticado");
         return;
       }
 
-      // Calcular webhook se tiver nível e formato
-      let webhookDestino = palestra.webhook_destino;
-      if (formData.nivel_escolhido && formData.formato_escolhido) {
-        webhookDestino = getWebhookDestino(formData.nivel_escolhido, formData.formato_escolhido);
-      }
-
-      const { data, error } = await supabase.rpc('scribia_update_palestra', {
-        p_palestra_id: palestra.id,
-        p_usuario_id: userId,
-        p_titulo: formData.titulo.trim(),
-        p_palestrante: formData.palestrante.trim() || null,
-        p_tags_tema: formData.tags_tema.length > 0 ? formData.tags_tema : null,
-        p_nivel_escolhido: formData.nivel_escolhido,
-        p_formato_escolhido: formData.formato_escolhido,
-        p_webhook_destino: webhookDestino,
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`http://localhost:3000/api/v1/palestras/${palestra.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          titulo: formData.titulo.trim(),
+          palestrante: formData.palestrante.trim() || null,
+          data_hora_inicio: formData.data_hora_inicio || null,
+          informacoes_adicionais: formData.informacoes_adicionais || null,
+        })
       });
 
-      if (error) throw error;
-
-      const result = data as { success: boolean; error?: string };
-
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao atualizar palestra');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar palestra');
       }
 
       toast.success("Palestra atualizada com sucesso!");
       onSuccess();
-      
-      // Só fecha se não estiver no modo de upload de áudio
-      if (!showAudioUpload) {
-        onOpenChange(false);
-      }
+      onOpenChange(false);
     } catch (error: any) {
       console.error('Erro ao atualizar palestra:', error);
       toast.error(error.message || "Erro ao atualizar palestra");
@@ -241,6 +205,28 @@ export function EditPalestraDialog({
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="data_hora_inicio">Data e Hora de Início</Label>
+              <Input
+                id="data_hora_inicio"
+                type="datetime-local"
+                value={formData.data_hora_inicio}
+                onChange={(e) => setFormData({ ...formData, data_hora_inicio: e.target.value })}
+                disabled={!canEditBasicInfo || loading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="informacoes_adicionais">Informações Adicionais</Label>
+              <Input
+                id="informacoes_adicionais"
+                value={formData.informacoes_adicionais}
+                onChange={(e) => setFormData({ ...formData, informacoes_adicionais: e.target.value })}
+                placeholder="Detalhes sobre a palestra"
+                disabled={!canEditBasicInfo || loading}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="tag">Tags/Temas</Label>
               <div className="flex gap-2">
                 <Input
@@ -288,129 +274,7 @@ export function EditPalestraDialog({
             </div>
           </div>
 
-          {/* Nível e Formato */}
-          {canEditNivelFormato && (
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Personalização do Livebook</h3>
-              
-              <div className="space-y-3">
-                <Label>Nível de Conhecimento</Label>
-                <RadioGroup
-                  value={formData.nivel_escolhido || ""}
-                  onValueChange={(value) => setFormData({ ...formData, nivel_escolhido: value as NivelConhecimento })}
-                  disabled={loading}
-                  className="grid grid-cols-3 gap-3"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="junior" id="junior" />
-                    <Label htmlFor="junior" className="cursor-pointer">Júnior</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="pleno" id="pleno" />
-                    <Label htmlFor="pleno" className="cursor-pointer">Pleno</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="senior" id="senior" />
-                    <Label htmlFor="senior" className="cursor-pointer">Sênior</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-3">
-                <Label>Formato</Label>
-                <RadioGroup
-                  value={formData.formato_escolhido || ""}
-                  onValueChange={(value) => setFormData({ ...formData, formato_escolhido: value as FormatoPalestra })}
-                  disabled={loading}
-                  className="grid grid-cols-2 gap-3"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="completo" id="completo" />
-                    <Label htmlFor="completo" className="cursor-pointer">Completo</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="compacto" id="compacto" />
-                    <Label htmlFor="compacto" className="cursor-pointer">Compacto</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-          )}
-
-          {/* Status atual do nível/formato se não editável */}
-          {!canEditNivelFormato && (palestra.nivel_escolhido || palestra.formato_escolhido) && (
-            <div className="space-y-2 border-t pt-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Personalização (não editável)</h3>
-              <div className="flex gap-2">
-                {palestra.nivel_escolhido && (
-                  <Badge variant="secondary">
-                    {palestra.nivel_escolhido === 'junior' ? 'Júnior' : 
-                     palestra.nivel_escolhido === 'pleno' ? 'Pleno' : 'Sênior'}
-                  </Badge>
-                )}
-                {palestra.formato_escolhido && (
-                  <Badge variant="outline">
-                    {palestra.formato_escolhido === 'completo' ? 'Completo' : 'Compacto'}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Re-upload de Áudio */}
-          {canReuploadAudio && (
-            <div className="space-y-4 border-t pt-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-muted-foreground">Upload de Áudio</h3>
-                {!showAudioUpload && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAudioUpload(true)}
-                    disabled={loading}
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    {palestra.audio_url ? 'Substituir Áudio' : 'Adicionar Áudio'}
-                  </Button>
-                )}
-              </div>
-              
-              {palestra.audio_url && !showAudioUpload && (
-                <p className="text-sm text-muted-foreground">
-                  Áudio já carregado. Clique em "Substituir Áudio" para enviar um novo.
-                </p>
-              )}
-
-              {showAudioUpload && (
-                <div className="space-y-3">
-                  {!formData.nivel_escolhido || !formData.formato_escolhido ? (
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        Selecione o nível e formato acima antes de fazer upload do áudio.
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <>
-                      <AudioUploader
-                        palestraId={palestra.id}
-                        onUploadComplete={handleAudioUploadComplete}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowAudioUpload(false)}
-                      >
-                        Cancelar upload
-                      </Button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+          {/* Fim dos campos básicos */}
         </div>
 
         <DialogFooter>

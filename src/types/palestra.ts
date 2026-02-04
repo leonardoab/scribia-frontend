@@ -1,25 +1,17 @@
-export type NivelConhecimento = 'junior' | 'pleno' | 'senior';
-export type FormatoPalestra = 'completo' | 'compacto';
-export type OrigemClassificacao = 'auto' | 'manual';
 export type StatusPalestra = 'planejada' | 'em_andamento' | 'concluida' | 'cancelada';
 
 export interface Palestra {
   id: string;
-  evento_id: string | null; // Agora pode ser NULL para livebooks gerais
+  evento_id: string | null;
   usuario_id: string;
   titulo: string;
   palestrante: string | null;
+  data_hora_inicio: string | null;
+  informacoes_adicionais: string | null;
   tags_tema: string[] | null;
-  nivel_escolhido: NivelConhecimento | null;
-  formato_escolhido: FormatoPalestra | null;
-  origem_classificacao: OrigemClassificacao;
-  confidence: number | null;
-  webhook_destino: string | null;
   status: StatusPalestra;
-  audio_urls?: string[] | null;
-  audio_url: string | null;
-  slides_url: string | null;
   transcricao_url: string | null;
+  slides_url: string | null;
   criado_em: string;
   atualizado_em: string;
 }

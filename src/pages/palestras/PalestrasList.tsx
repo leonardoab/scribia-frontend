@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,9 +34,11 @@ const PalestrasList = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [palestraToEdit, setPalestraToEdit] = useState<Palestra | null>(null);
   const [nomeEvento, setNomeEvento] = useState("");
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (eventoId) {
+    if (eventoId && !hasFetched.current) {
+      hasFetched.current = true;
       fetchEvento();
       fetchPalestras();
     }
