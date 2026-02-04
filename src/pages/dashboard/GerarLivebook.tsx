@@ -56,7 +56,13 @@ const GerarLivebook = () => {
   const [livebookId, setLivebookId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [preparingUpload, setPreparingUpload] = useState(false);
+  const [relacionarEvento, setRelacionarEvento] = useState(false);
+  const [eventoId, setEventoId] = useState<string>('');
+  const [eventos, setEventos] = useState<any[]>([]);
+  const [palestras, setPalestras] = useState<any[]>([]);
+  const [palestraSelecionada, setPalestraSelecionada] = useState<string>('');
   const { toast } = useToast();
+  const hasFetchedEventos = React.useRef(false);
 
   // Buscar perfil do usuário e registrar intenção
   React.useEffect(() => {
@@ -87,6 +93,57 @@ const GerarLivebook = () => {
     };
     fetchUserProfile();
   }, [user?.profile?.id]);
+
+  // Buscar eventos do usuário
+  React.useEffect(() => {
+    const fetchEventos = async () => {
+      if (!user?.profile?.id || hasFetchedEventos.current) return;
+      hasFetchedEventos.current = true;
+      
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/eventos', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Eventos carregados:', data);
+          const eventosArray = data.data?.eventos || data.eventos || [];
+          console.log('Array de eventos:', eventosArray);
+          setEventos(eventosArray);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar eventos:', error);
+      }
+    };
+    if (relacionarEvento) {
+      hasFetchedEventos.current = false;
+      fetchEventos();
+    }
+  }, [relacionarEvento, user?.profile?.id]);
+
+  // Buscar palestras do evento selecionado
+  React.useEffect(() => {
+    const fetchPalestras = async () => {
+      if (!eventoId) return;
+      try {
+        const response = await fetch(`http://localhost:3000/api/v1/eventos/${eventoId}/palestras`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Palestras carregadas:', data);
+          setPalestras(data.data?.palestras || data.data || data || []);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar palestras:', error);
+      }
+    };
+    fetchPalestras();
+  }, [eventoId]);
 
   // Criar palestra temporária para upload de áudio
   const criarPalestra = async () => {
@@ -195,10 +252,19 @@ const GerarLivebook = () => {
       return;
     }
 
-    // Criar palestra temporária se não existir (modo texto)
-    let currentPalestraId = palestraId;
+    if (relacionarEvento && (!eventoId || !palestraSelecionada)) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione um evento e uma palestra",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Usar palestra selecionada ou criar nova
+    let currentPalestraId = relacionarEvento ? palestraSelecionada : palestraId;
     if (!currentPalestraId) {
-      console.log('📝 Criando palestra temporária para modo texto...');
+      console.log('📝 Criando palestra temporária...');
       currentPalestraId = await criarPalestra();
       if (!currentPalestraId) {
         toast({
@@ -222,6 +288,7 @@ const GerarLivebook = () => {
         },
         body: JSON.stringify({
           palestra_id: currentPalestraId,
+          titulo: titulo,
           tipo_resumo: userPerfil.includes('compacto') ? 'executivo' : 'completo',
         })
       });
@@ -247,6 +314,9 @@ const GerarLivebook = () => {
       setTitulo('');
       setPalestrante('');
       setPalestraId(null);
+      setRelacionarEvento(false);
+      setEventoId('');
+      setPalestraSelecionada('');
 
     } catch (error: any) {
       console.error('Erro ao gerar Livebook:', error);
@@ -649,6 +719,66 @@ const GerarLivebook = () => {
                   Inclua nome, cargo e empresa se desejar
                 </p>
               </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="relacionar"
+                  checked={relacionarEvento}
+                  onChange={(e) => {
+                    setRelacionarEvento(e.target.checked);
+                    if (!e.target.checked) {
+                      setEventoId('');
+                      setPalestraSelecionada('');
+                    }
+                  }}
+                  className="h-4 w-4"
+                />
+                <Label htmlFor="relacionar" className="cursor-pointer">
+                  Relacionar com evento e palestra existente
+                </Label>
+              </div>
+
+              {relacionarEvento && (
+                <>
+                  <div>
+                    <Label htmlFor="evento">Evento *</Label>
+                    <Select value={eventoId} onValueChange={(value) => {
+                      setEventoId(value);
+                      setPalestraSelecionada('');
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um evento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.isArray(eventos) && eventos.map((evento) => (
+                          <SelectItem key={evento.id} value={evento.id}>
+                            {evento.nome_evento}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {eventoId && (
+                    <div>
+                      <Label htmlFor="palestra">Palestra *</Label>
+                      <Select value={palestraSelecionada} onValueChange={setPalestraSelecionada}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma palestra" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(palestras) && palestras.map((palestra) => (
+                            <SelectItem key={palestra.id} value={palestra.id}>
+                              {palestra.titulo}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </Card>
 

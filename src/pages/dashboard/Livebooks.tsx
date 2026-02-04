@@ -64,6 +64,7 @@ const Livebooks = () => {
         const backendData = response.data.data || response.data;
         const livebooksData = backendData.livebooks || [];
         
+        console.log('Livebooks recebidos:', livebooksData);
         setLivebooks(Array.isArray(livebooksData) ? livebooksData : []);
       } catch (err: any) {
         console.error('Erro ao buscar livebooks:', err);
@@ -396,7 +397,7 @@ const Livebooks = () => {
                       <BookOpen className="h-5 w-5 text-primary mt-1" />
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold mb-2">
-                          {livebook.palestra?.titulo || 'Sem título'}
+                          {livebook.titulo || livebook.palestra?.titulo || 'Sem título'}
                         </h3>
                         
                         {livebook.palestra?.palestrante && (
