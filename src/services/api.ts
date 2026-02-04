@@ -69,6 +69,8 @@ export const livebooksApi = {
   list: () => api.get('/livebooks'),
   get: (id: string) => api.get(`/livebooks/${id}`),
   create: (data: any) => api.post('/livebooks', data),
+  registrarIntencao: (origem: 'gravar_agora' | 'upload_arquivo' | 'gerar_livebook') => 
+    api.post('/livebooks/registrar-intencao', { origem }),
   getOpcoes: (palestraId: string) => api.get(`/livebooks/palestra/${palestraId}/opcoes`),
   getDownloadUrl: (id: string, formato: string) => api.get(`/livebooks/${id}/download/${formato}`),
   getByPalestra: (palestraId: string) => api.get(`/livebooks/palestra/${palestraId}`),

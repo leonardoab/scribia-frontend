@@ -19,13 +19,14 @@ interface QuickLivebookModalProps {
   onPalestraCreated?: (palestraId: string) => void;
   eventoId?: string;
   eventoNome?: string;
+  defaultTab?: "record" | "upload";
 }
 
-export function QuickLivebookModal({ open, onOpenChange, onPalestraCreated, eventoId, eventoNome }: QuickLivebookModalProps) {
+export function QuickLivebookModal({ open, onOpenChange, onPalestraCreated, eventoId, eventoNome, defaultTab = "record" }: QuickLivebookModalProps) {
   const { user } = useCustomAuth();
   const [titulo, setTitulo] = useState("");
   const [palestrante, setPalestrante] = useState("");
-  const [currentTab, setCurrentTab] = useState<"record" | "upload">("record");
+  const [currentTab, setCurrentTab] = useState<"record" | "upload">(defaultTab);
   const [palestraId, setPalestraId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [userPerfil, setUserPerfil] = useState<string | null>(null);
@@ -57,6 +58,13 @@ export function QuickLivebookModal({ open, onOpenChange, onPalestraCreated, even
 
     fetchUserProfile();
   }, [user?.id]);
+
+  // Resetar tab quando modal abre
+  useEffect(() => {
+    if (open) {
+      setCurrentTab(defaultTab);
+    }
+  }, [open, defaultTab]);
 
   // Criar palestra
   const createPalestra = async () => {
@@ -241,7 +249,7 @@ export function QuickLivebookModal({ open, onOpenChange, onPalestraCreated, even
     setPalestrante("");
     setPalestraId(null);
     setIsProcessing(false);
-    setCurrentTab("record");
+    setCurrentTab(defaultTab);
     setShowRecorder(false);
     setShowProgress(false);
     // Resetar perfil para padrão do usuário

@@ -469,34 +469,30 @@ const Livebooks = () => {
 
                   {livebook.status === 'concluido' && (
                     <>
-                      {livebook.pdf_url && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleDownloadPdf(livebook)}
-                        >
-                          <FileText className="h-3 w-3 mr-1" />
-                          PDF
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadPdf(livebook)}
+                      >
+                        <FileText className="h-3 w-3 mr-1" />
+                        PDF
+                      </Button>
                       
-                      {livebook.docx_url && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadTxt(livebook)}
-                        >
-                          <Download className="h-3 w-3 mr-1" />
-                          TXT
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadTxt(livebook)}
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        TXT
+                      </Button>
                     </>
                   )}
 
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleView(livebook.id)}
+                    onClick={() => navigate(`/dashboard/livebooks/${livebook.id}`)}
                   >
                     <Eye className="h-3 w-3 mr-1" />
                     Ver

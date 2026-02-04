@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import DashboardHome from '@/pages/dashboard/Dashboard';
 import EventosDashboard from '@/pages/dashboard/EventosDashboard';
 import Livebooks from '@/pages/dashboard/Livebooks';
+import LivebookView from '@/pages/dashboard/LivebookView';
 import Bia from '@/pages/dashboard/Bia';
 import Tutor from '@/pages/dashboard/Tutor';
 import GerarLivebook from '@/pages/dashboard/GerarLivebook';
@@ -87,6 +88,7 @@ const DashboardLayout = () => {
             <Route path="bia" element={<Bia />} />
             <Route path="tutor" element={<Tutor />} />
             <Route path="livebooks" element={<Livebooks />} />
+            <Route path="livebooks/:id" element={<LivebookView />} />
             <Route path="livebooks/:livebookId" element={<LivebookDetalhe />} />
             <Route path="ajuda" element={<Ajuda />} />
             <Route path="configuracoes" element={<Configuracoes />} />

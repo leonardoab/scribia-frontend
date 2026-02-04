@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
+import { livebooksApi } from '@/services/api';
 import { AudioUploader } from '@/components/audio/AudioUploader';
 import { BookOpen, Upload, Loader2, Download, Mic, FileText, Save } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -57,8 +58,11 @@ const GerarLivebook = () => {
   const [preparingUpload, setPreparingUpload] = useState(false);
   const { toast } = useToast();
 
-  // Buscar perfil do usuário
+  // Buscar perfil do usuário e registrar intenção
   React.useEffect(() => {
+    // Registrar intenção ao acessar a página
+    livebooksApi.registrarIntencao('gerar_livebook').catch(console.error);
+
     const fetchUserProfile = async () => {
       if (!user?.profile?.id) return;
       try {

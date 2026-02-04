@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
-import { dashboardApi } from '@/services/api';
+import { dashboardApi, livebooksApi } from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { QuickLivebookModal } from '@/components/dashboard/QuickLivebookModal';
 import { LivebookProgress } from '@/components/dashboard/LivebookProgress';
@@ -50,6 +50,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isQuickModalOpen, setIsQuickModalOpen] = useState(false);
+  const [quickModalTab, setQuickModalTab] = useState<"record" | "upload">("record");
   const [progressModalOpen, setProgressModalOpen] = useState(false);
   const [monitoringPalestraId, setMonitoringPalestraId] = useState<string | null>(null);
   const [completedLivebookId, setCompletedLivebookId] = useState<string | null>(null);
@@ -199,7 +200,11 @@ const Dashboard = () => {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                onClick={() => setIsQuickModalOpen(true)}
+                onClick={() => {
+                  livebooksApi.registrarIntencao('gravar_agora').catch(console.error);
+                  setQuickModalTab("record");
+                  setIsQuickModalOpen(true);
+                }}
               >
                 <Mic className="mr-2 h-5 w-5" />
                 Gravar Agora
@@ -207,7 +212,11 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                onClick={() => setIsQuickModalOpen(true)}
+                onClick={() => {
+                  livebooksApi.registrarIntencao('upload_arquivo').catch(console.error);
+                  setQuickModalTab("upload");
+                  setIsQuickModalOpen(true);
+                }}
               >
                 <Upload className="mr-2 h-5 w-5" />
                 Upload de Arquivo
@@ -501,6 +510,7 @@ const Dashboard = () => {
         open={isQuickModalOpen}
         onOpenChange={setIsQuickModalOpen}
         onPalestraCreated={handlePalestraCreated}
+        defaultTab={quickModalTab}
       />
 
       {/* Modal de Progresso do Livebook */}
