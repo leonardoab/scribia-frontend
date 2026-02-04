@@ -79,6 +79,7 @@ const DashboardLayout = () => {
           <Routes>
             <Route index element={<DashboardHome />} />
             <Route path="eventos" element={<EventosDashboard />} />
+            <Route path="palestras" element={<PalestrasList />} />
             <Route path="eventos/:eventoId/palestras" element={<PalestrasList />} />
             <Route path="eventos/:eventoId/palestras/nova" element={<PalestraForm />} />
             <Route path="eventos/:eventoId/palestras/:palestraId" element={<PalestraDetalhe />} />

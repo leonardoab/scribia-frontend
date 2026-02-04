@@ -16,6 +16,7 @@ interface Evento {
   nome_evento: string;
   data_inicio: string;
   data_fim: string;
+  formato_evento: string;
   cidade: string;
   estado: string;
   pais: string;
@@ -68,6 +69,7 @@ const MeusEventos = () => {
               nome_evento: evento.nome_evento,
               data_inicio: evento.data_inicio,
               data_fim: evento.data_fim,
+              formato_evento: evento.formato_evento || 'remoto',
               cidade: evento.cidade || '',
               estado: evento.estado || '',
               pais: evento.pais || 'Brasil',
@@ -93,6 +95,7 @@ const MeusEventos = () => {
               nome_evento: evento.nome_evento,
               data_inicio: evento.data_inicio,
               data_fim: evento.data_fim,
+              formato_evento: evento.formato_evento || 'remoto',
               cidade: evento.cidade || '',
               estado: evento.estado || '',
               pais: evento.pais || 'Brasil',
@@ -341,10 +344,18 @@ const MeusEventos = () => {
                         <Calendar className="h-4 w-4" />
                         <span>{formatPeriodo(evento.data_inicio, evento.data_fim)}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        <span>{evento.cidade}, {evento.estado}, {evento.pais}</span>
-                      </div>
+                      {(evento.formato_evento === 'presencial' || evento.formato_evento === 'hibrido') && evento.cidade && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          <span>{evento.cidade}, {evento.estado}, {evento.pais}</span>
+                        </div>
+                      )}
+                      {evento.formato_evento === 'remoto' && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          <span>Evento Remoto</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <Badge className={getStatusColor(evento.status)}>

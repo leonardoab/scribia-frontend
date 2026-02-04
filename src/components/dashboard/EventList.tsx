@@ -72,12 +72,24 @@ export function EventList({ eventos, onEdit, onDelete, loading }: EventListProps
           </CardHeader>
           <CardContent className="flex flex-col flex-1 gap-4">
             <div className="space-y-3 flex-1">
-              {(evento.cidade || evento.estado || evento.pais) && (
+              {(evento.formato_evento === 'presencial' || evento.formato_evento === 'hibrido') && (evento.cidade || evento.estado || evento.pais) && (
                 <div className="flex items-start gap-2 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
                   <span className="line-clamp-2">
                     {[evento.cidade, evento.estado, evento.pais].filter(Boolean).join(", ")}
                   </span>
+                </div>
+              )}
+              {evento.formato_evento === 'remoto' && (
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>Evento Remoto</span>
+                </div>
+              )}
+              {evento.formato_evento === 'hibrido' && (
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>Evento Híbrido</span>
                 </div>
               )}
               

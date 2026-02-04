@@ -208,19 +208,21 @@ const PalestrasList = () => {
     <div className="p-4 sm:p-6 py-6 space-y-6 w-full">
         {/* Header */}
         <div className="flex flex-col gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dashboard/eventos")}
-            className="w-fit"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar para Eventos
-          </Button>
+          {eventoId && (
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/dashboard/eventos")}
+              className="w-fit"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar para Eventos
+            </Button>
+          )}
 
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-3xl font-bold tracking-tight">
-                Palestras - {nomeEvento}
+                {eventoId ? `Palestras - ${nomeEvento}` : 'Minhas Palestras'}
               </h2>
               <p className="text-muted-foreground mt-1">
                 Gerencie as palestras deste evento

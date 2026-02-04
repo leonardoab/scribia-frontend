@@ -26,6 +26,7 @@ export function EventForm({ open, onOpenChange, onSubmit, evento, loading }: Eve
     nome_evento: "",
     data_inicio: "",
     data_fim: "",
+    formato_evento: "",
     cidade: "",
     estado: "",
     pais: "",
@@ -38,6 +39,7 @@ export function EventForm({ open, onOpenChange, onSubmit, evento, loading }: Eve
         nome_evento: evento.nome_evento,
         data_inicio: evento.data_inicio || "",
         data_fim: evento.data_fim || "",
+        formato_evento: evento.formato_evento || "",
         cidade: evento.cidade || "",
         estado: evento.estado || "",
         pais: evento.pais || "",
@@ -48,6 +50,7 @@ export function EventForm({ open, onOpenChange, onSubmit, evento, loading }: Eve
         nome_evento: "",
         data_inicio: "",
         data_fim: "",
+        formato_evento: "",
         cidade: "",
         estado: "",
         pais: "",
@@ -105,35 +108,78 @@ export function EventForm({ open, onOpenChange, onSubmit, evento, loading }: Eve
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cidade">Cidade</Label>
-              <Input
-                id="cidade"
-                placeholder="São Paulo"
-                value={formData.cidade}
-                onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
-              />
+              <Label>Formato do Evento</Label>
+              <div className="flex gap-4 mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="formato_evento"
+                    value="presencial"
+                    checked={formData.formato_evento === 'presencial'}
+                    onChange={(e) => setFormData({...formData, formato_evento: e.target.value})}
+                    className="w-4 h-4"
+                  />
+                  <span>Presencial</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="formato_evento"
+                    value="remoto"
+                    checked={formData.formato_evento === 'remoto'}
+                    onChange={(e) => setFormData({...formData, formato_evento: e.target.value})}
+                    className="w-4 h-4"
+                  />
+                  <span>Remoto</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="formato_evento"
+                    value="hibrido"
+                    checked={formData.formato_evento === 'hibrido'}
+                    onChange={(e) => setFormData({...formData, formato_evento: e.target.value})}
+                    className="w-4 h-4"
+                  />
+                  <span>Híbrido</span>
+                </label>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="estado">Estado</Label>
-                <Input
-                  id="estado"
-                  placeholder="SP"
-                  value={formData.estado}
-                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pais">País</Label>
-                <Input
-                  id="pais"
-                  placeholder="Brasil"
-                  value={formData.pais}
-                  onChange={(e) => setFormData({ ...formData, pais: e.target.value })}
-                />
-              </div>
-            </div>
+            {(formData.formato_evento === 'presencial' || formData.formato_evento === 'hibrido') && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="cidade">Cidade</Label>
+                  <Input
+                    id="cidade"
+                    placeholder="São Paulo"
+                    value={formData.cidade}
+                    onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="estado">Estado</Label>
+                    <Input
+                      id="estado"
+                      placeholder="SP"
+                      value={formData.estado}
+                      onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pais">País</Label>
+                    <Input
+                      id="pais"
+                      placeholder="Brasil"
+                      value={formData.pais}
+                      onChange={(e) => setFormData({ ...formData, pais: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="observacoes">Observações</Label>

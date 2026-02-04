@@ -20,7 +20,11 @@ const CriarEvento = () => {
     nome_evento: '',
     data_inicio_evento: '',
     data_fim_evento: '',
+    formato_evento: '',
     tipo_evento: '',
+    cidade: '',
+    estado: '',
+    pais: '',
     url_evento: '',
     logo_url: ''
   });
@@ -61,6 +65,10 @@ const CriarEvento = () => {
           nome_evento: formData.nome_evento,
           data_inicio: formData.data_inicio_evento || null,
           data_fim: formData.data_fim_evento || null,
+          formato_evento: formData.formato_evento || null,
+          cidade: formData.cidade || null,
+          estado: formData.estado || null,
+          pais: formData.pais || null,
           tipo_evento: formData.tipo_evento || null,
           url_evento: formData.url_evento || null,
           logo_url: formData.logo_url || null,
@@ -133,6 +141,77 @@ const CriarEvento = () => {
                   />
                 </div>
               </div>
+
+              <div>
+                <Label>Formato do Evento *</Label>
+                <div className="flex gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="formato_evento"
+                      value="presencial"
+                      checked={formData.formato_evento === 'presencial'}
+                      onChange={(e) => setFormData({...formData, formato_evento: e.target.value})}
+                      className="w-4 h-4"
+                    />
+                    <span>Presencial</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="formato_evento"
+                      value="remoto"
+                      checked={formData.formato_evento === 'remoto'}
+                      onChange={(e) => setFormData({...formData, formato_evento: e.target.value})}
+                      className="w-4 h-4"
+                    />
+                    <span>Remoto</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="formato_evento"
+                      value="hibrido"
+                      checked={formData.formato_evento === 'hibrido'}
+                      onChange={(e) => setFormData({...formData, formato_evento: e.target.value})}
+                      className="w-4 h-4"
+                    />
+                    <span>Híbrido</span>
+                  </label>
+                </div>
+              </div>
+
+              {(formData.formato_evento === 'presencial' || formData.formato_evento === 'hibrido') && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="cidade">Cidade</Label>
+                    <Input
+                      id="cidade"
+                      value={formData.cidade}
+                      onChange={(e) => setFormData({...formData, cidade: e.target.value})}
+                      placeholder="Ex: São Paulo"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="estado">Estado</Label>
+                    <Input
+                      id="estado"
+                      value={formData.estado}
+                      onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                      placeholder="Ex: SP"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pais">País</Label>
+                    <Input
+                      id="pais"
+                      value={formData.pais}
+                      onChange={(e) => setFormData({...formData, pais: e.target.value})}
+                      placeholder="Ex: Brasil"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
