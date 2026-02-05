@@ -29,7 +29,6 @@ const Sidebar = ({ className, onNavigate }: SidebarProps) => {
     { icon: Calendar, label: 'Meus Eventos', path: '/dashboard/eventos' },
     { icon: BookOpen, label: 'Gerar Livebook', path: '/dashboard/gerar-livebook' },
     { icon: BookOpen, label: 'Meus Livebooks', path: '/dashboard/livebooks' },
-    { icon: Brain, label: 'Bia - Análise de Perfil', path: '/dashboard/bia' },
     { icon: FileText, label: 'Tutor ScribIA', path: '/dashboard/tutor' },
     { icon: HelpCircle, label: 'Ajuda / Suporte', path: '/dashboard/ajuda' },
   ];

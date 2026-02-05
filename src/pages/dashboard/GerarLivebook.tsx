@@ -15,32 +15,6 @@ import { BookOpen, Upload, Loader2, Download, Mic, FileText, Save } from 'lucide
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const PERFIS = [{
-  value: 'junior-completo',
-  label: 'Júnior Completo',
-  desc: 'Profissional iniciante - conteúdo educativo detalhado (4.000-15.000 palavras)'
-}, {
-  value: 'junior-compacto',
-  label: 'Júnior Compacto',
-  desc: 'Iniciante com foco direto - essencial e claro (até 4.000 palavras)'
-}, {
-  value: 'pleno-completo',
-  label: 'Pleno Completo',
-  desc: 'Profissional experiente - equilíbrio teoria e prática (4.000-15.000 palavras)'
-}, {
-  value: 'pleno-compacto',
-  label: 'Pleno Compacto',
-  desc: 'Experiente com pouco tempo - aplicabilidade direta (até 4.000 palavras)'
-}, {
-  value: 'senior-completo',
-  label: 'Sênior Completo',
-  desc: 'Visão estratégica - análise crítica aprofundada (4.000-15.000 palavras)'
-}, {
-  value: 'senior-compacto',
-  label: 'Sênior Compacto',
-  desc: 'Líder/Especialista - síntese estratégica densa (até 4.000 palavras)'
-}];
-
 const GerarLivebook = () => {
   const { user } = useCustomAuth();
   const [transcricao, setTranscricao] = useState('');
@@ -50,7 +24,6 @@ const GerarLivebook = () => {
   const [livebookGerado, setLivebookGerado] = useState('');
   const [palestraId, setPalestraId] = useState<string | null>(null);
   const [uploadMode, setUploadMode] = useState<'audio' | 'text'>('audio');
-  const [userPerfil, setUserPerfil] = useState<string>('');
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [txtUrl, setTxtUrl] = useState<string | null>(null);
   const [livebookId, setLivebookId] = useState<string | null>(null);
@@ -64,35 +37,10 @@ const GerarLivebook = () => {
   const { toast } = useToast();
   const hasFetchedEventos = React.useRef(false);
 
-  // Buscar perfil do usuário e registrar intenção
+  // Registrar intenção ao acessar a página
   React.useEffect(() => {
-    // Registrar intenção ao acessar a página
     livebooksApi.registrarIntencao('gerar_livebook').catch(console.error);
-
-    const fetchUserProfile = async () => {
-      if (!user?.profile?.id) return;
-      try {
-        const response = await fetch(`http://localhost:3000/api/v1/usuarios/${user.profile.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-          }
-        });
-
-        if (!response.ok) throw new Error('Erro ao buscar perfil');
-
-        const responseData = await response.json();
-        const data = responseData.data || responseData;
-        
-        if (data?.nivel_preferido && data?.formato_preferido) {
-          const perfil = `${data.nivel_preferido}-${data.formato_preferido}`;
-          setUserPerfil(perfil);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar perfil do usuário:', error);
-      }
-    };
-    fetchUserProfile();
-  }, [user?.profile?.id]);
+  }, []);
 
   // Buscar eventos do usuário
   React.useEffect(() => {

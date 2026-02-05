@@ -359,31 +359,7 @@ const Dashboard = () => {
       </div>
 
       {/* Cards de Agentes IA */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bia - Análise de Perfil */}
-        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-purple-900">Bia - Análise de Perfil</h3>
-              </div>
-              <p className="text-gray-700">
-                Converse com a Bia para reavaliar seu perfil de aprendizado e personalizar ainda mais seus Livebooks.
-              </p>
-              <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700"
-                onClick={() => navigate('/dashboard/bia')}
-              >
-                <Brain className="mr-2 h-5 w-5" />
-                Conversar com Bia
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 gap-6">
         {/* Tutor ScribIA */}
         <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
           <CardContent className="p-6">
