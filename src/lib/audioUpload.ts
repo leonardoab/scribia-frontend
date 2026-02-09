@@ -39,77 +39,18 @@ export async function uploadAudioToTranscribe(
     throw new Error(`Arquivo muito grande. Tamanho máximo: 500MB. Para arquivos maiores, entre em contato com o suporte.`);
   }
   
-  console.log('📦 Fazendo upload ao Storage...');
+  console.log('📦 Fazendo upload do áudio...');
   if (onProgress) onProgress(20);
   
-  // 1. Upload do áudio para o Storage
-  const fileName = `${userId}/audios/${palestraId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-  
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('scribia-audio')
-    .upload(fileName, file, {
-      contentType: file.type,
-      upsert: true,
-    });
-
-  if (uploadError) {
-    console.error('❌ Erro no upload:', uploadError);
-    throw new Error(`Erro no upload: ${uploadError.message}`);
-  }
-
-  console.log('✅ Upload concluído:', fileName);
+  // Simular upload (remover Supabase Storage)
+  console.log('✅ Upload simulado concluído');
   if (onProgress) onProgress(50);
 
-  // 2. Gerar URL assinada (válida por 24h) para o Deepgram acessar
-  const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-    .from('scribia-audio')
-    .createSignedUrl(fileName, 86400); // 24 horas em segundos
-
-  if (signedUrlError || !signedUrlData?.signedUrl) {
-    console.error('❌ Erro ao gerar signed URL:', signedUrlError);
-    throw new Error(`Erro ao gerar URL autenticada: ${signedUrlError?.message || 'URL inválida'}`);
-  }
-
-  console.log('🔗 URL autenticada gerada (válida por 24h)');
-  if (onProgress) onProgress(60);
-
-  // 3. Mock de transcrição (simulação)
+  
+  // Simular transcrição
   console.log('🎙️ Simulando transcrição...');
-  console.log('📋 Palestra ID recebido:', palestraId);
-  console.log('👤 User ID:', userId);
-  
-  // Simular delay de processamento
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Criar palestra nova (o palestraId recebido é apenas um UUID temporário)
-  let realPalestraId = palestraId;
-  try {
-    console.log('🎬 Criando palestra...');
-    const createPalestraResponse = await fetch(`${getApiBaseUrl()}/palestras`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-      },
-      body: JSON.stringify({
-        titulo: 'Livebook via Upload',
-        palestrante: 'Não informado',
-        status: 'planejada',
-      }),
-    });
-    
-    if (createPalestraResponse.ok) {
-      const palestraData = await createPalestraResponse.json();
-      realPalestraId = palestraData.data?.id || palestraData.id;
-      console.log('✅ Palestra criada:', realPalestraId);
-    } else {
-      console.error('❌ Erro ao criar palestra');
-      throw new Error('Erro ao criar palestra');
-    }
-  } catch (error) {
-    console.error('❌ Erro ao criar palestra:', error);
-    throw error;
-  }
+  if (onProgress) onProgress(80);
   
   // Criar livebook mockado via API com URLs de documentos
   try {
@@ -120,7 +61,8 @@ export async function uploadAudioToTranscribe(
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
       },
       body: JSON.stringify({
-        palestra_id: realPalestraId,
+        ...(palestraId && { palestra_id: palestraId }),
+        titulo: file.name.replace(/\.[^/.]+$/, ''),
         tipo_resumo: 'completo',
         status: 'concluido',
       }),

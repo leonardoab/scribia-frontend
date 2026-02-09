@@ -248,20 +248,8 @@ const GerarLivebook = () => {
       return;
     }
 
-    // Usar palestra selecionada ou criar nova
-    let currentPalestraId = relacionarEvento ? palestraSelecionada : palestraId;
-    if (!currentPalestraId) {
-      console.log('📝 Criando palestra temporária...');
-      currentPalestraId = await criarPalestra();
-      if (!currentPalestraId) {
-        toast({
-          title: "Erro",
-          description: "Não foi possível criar registro da palestra",
-          variant: "destructive"
-        });
-        return;
-      }
-    }
+    // Usar palestra selecionada se houver relacionamento com evento
+    let currentPalestraId = relacionarEvento ? palestraSelecionada : null;
 
     setIsGenerating(true);
     setLivebookGerado('');
@@ -274,7 +262,7 @@ const GerarLivebook = () => {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify({
-          palestra_id: currentPalestraId,
+          ...(currentPalestraId && { palestra_id: currentPalestraId }),
           titulo: titulo,
           tipo_resumo: 'completo',
         })
