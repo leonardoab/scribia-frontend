@@ -55,6 +55,8 @@ export const eventosApi = {
   update: (id: string, data: any) => api.put(`/eventos/${id}`, data),
   delete: (id: string) => api.delete(`/eventos/${id}`),
   getEstatisticas: (id: string) => api.get(`/eventos/${id}/estatisticas`),
+  gerarLink: (id: string) => api.post(`/eventos/${id}/gerar-link`),
+  associar: (token: string) => api.post(`/eventos/associar/${token}`),
 };
 
 // Palestras

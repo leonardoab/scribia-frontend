@@ -61,6 +61,7 @@ const Dashboard = () => {
     totalPalestras: 0,
     totalLivebooks: 0,
     livebooksConcluidos: 0,
+    eventosAtivos: 0,
     eventos_recentes: [] as any[],
     livebooks_recentes: [] as any[]
   });
@@ -84,6 +85,7 @@ const Dashboard = () => {
           totalPalestras: stats.total_palestras || 0,
           totalLivebooks: stats.total_livebooks || 0,
           livebooksConcluidos: stats.livebooks_concluidos || 0,
+          eventosAtivos: stats.eventos_ativos || 0,
           eventos_recentes: backendData.eventos_recentes || [],
           livebooks_recentes: backendData.livebooks_recentes || []
         });

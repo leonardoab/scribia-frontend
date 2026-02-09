@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Calendar, MapPin, Users, BookOpen, Plus, Eye, Edit, Trash2, Filter, Search, Play, Clock, CheckCircle, Mic, Loader2
+  Calendar, MapPin, Users, BookOpen, Plus, Eye, Edit, Trash2, Filter, Search, Play, Clock, CheckCircle, Mic, Loader2, Link2, Copy
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,72 +45,37 @@ const MeusEventos = () => {
     try {
       setLoading(true);
       const response = await eventosApi.list();
-      console.log('Response eventos:', response);
       const eventosData = response.data?.data?.eventos || response.data?.eventos || response.data || [];
-      console.log('Eventos data:', eventosData);
 
-      const eventosComStats = await Promise.all(
-        (Array.isArray(eventosData) ? eventosData : []).map(async (evento: any) => {
-          try {
-            const statsResponse = await eventosApi.getEstatisticas(evento.id);
-            const stats = statsResponse.data;
-            
-            const now = new Date();
-            const dataInicio = new Date(evento.data_inicio);
-            const dataFim = new Date(evento.data_fim);
-            
-            let status = 'Agendado';
-            if (now >= dataInicio && now <= dataFim) {
-              status = 'Em andamento';
-            } else if (now > dataFim) {
-              status = 'Concluído';
-            }
-            
-            return {
-              id: evento.id,
-              nome_evento: evento.nome_evento,
-              data_inicio: evento.data_inicio,
-              data_fim: evento.data_fim,
-              formato_evento: evento.formato_evento || 'remoto',
-              cidade: evento.cidade || '',
-              estado: evento.estado || '',
-              pais: evento.pais || 'Brasil',
-              status,
-              participantes: stats.participantes_unicos || 0,
-              livebooks: stats.total_livebooks || 0,
-              palestras: stats.total_palestras || 0,
-            };
-          } catch (error) {
-            const now = new Date();
-            const dataInicio = new Date(evento.data_inicio);
-            const dataFim = new Date(evento.data_fim);
-            
-            let status = 'Agendado';
-            if (now >= dataInicio && now <= dataFim) {
-              status = 'Em andamento';
-            } else if (now > dataFim) {
-              status = 'Concluído';
-            }
-            
-            return {
-              id: evento.id,
-              nome_evento: evento.nome_evento,
-              data_inicio: evento.data_inicio,
-              data_fim: evento.data_fim,
-              formato_evento: evento.formato_evento || 'remoto',
-              cidade: evento.cidade || '',
-              estado: evento.estado || '',
-              pais: evento.pais || 'Brasil',
-              status,
-              participantes: 0,
-              livebooks: 0,
-              palestras: 0,
-            };
-          }
-        })
-      );
+      const eventosComStatus = (Array.isArray(eventosData) ? eventosData : []).map((evento: any) => {
+        const now = new Date();
+        const dataInicio = new Date(evento.data_inicio);
+        const dataFim = new Date(evento.data_fim);
+        
+        let status = 'Agendado';
+        if (now >= dataInicio && now <= dataFim) {
+          status = 'Em andamento';
+        } else if (now > dataFim) {
+          status = 'Concluído';
+        }
+        
+        return {
+          id: evento.id,
+          nome_evento: evento.nome_evento,
+          data_inicio: evento.data_inicio,
+          data_fim: evento.data_fim,
+          formato_evento: evento.formato_evento || 'remoto',
+          cidade: evento.cidade || '',
+          estado: evento.estado || '',
+          pais: evento.pais || 'Brasil',
+          status,
+          participantes: evento.participantes_unicos || 0,
+          livebooks: evento.total_livebooks || 0,
+          palestras: evento.total_palestras || 0,
+        };
+      });
 
-      setEventos(eventosComStats);
+      setEventos(eventosComStatus);
     } catch (error: any) {
       console.error('Erro ao buscar eventos:', error);
       toast({
@@ -168,6 +133,24 @@ const MeusEventos = () => {
     const inicio = new Date(dataInicio).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     const fim = new Date(dataFim).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     return dataInicio === dataFim ? inicio : `${inicio} - ${fim}`;
+  };
+
+  const copiarLinkConvite = async (eventoId: string) => {
+    try {
+      const response = await eventosApi.gerarLink(eventoId);
+      const link = response.data.data?.link || response.data.link;
+      await navigator.clipboard.writeText(link);
+      toast({
+        title: 'Link copiado!',
+        description: 'O link de convite foi copiado para a área de transferência',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao gerar link',
+        description: error.response?.data?.message || 'Não foi possível gerar o link',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (loading) {
@@ -392,6 +375,15 @@ const MeusEventos = () => {
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Ver Detalhes
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="border-green-200 text-green-700 hover:bg-green-50"
+                    onClick={() => copiarLinkConvite(evento.id)}
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copiar Link
                   </Button>
                   <Button 
                     variant="outline" 

@@ -41,6 +41,7 @@ const SelecionarPlano = lazy(() => import("./pages/SelecionarPlano"));
 const OrganizadoresLanding = lazy(() => import("./pages/OrganizadoresLanding"));
 const PalestrantesLanding = lazy(() => import("./pages/PalestrantesLanding"));
 const PatrocinadoresLanding = lazy(() => import("./pages/PatrocinadoresLanding"));
+const AssociarEvento = lazy(() => import("./pages/eventos/AssociarEvento"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -82,6 +83,7 @@ const App = () => (
                   <Route path="/esqueci-senha" element={<EsqueciSenha />} />
                   <Route path="/redefinir-senha" element={<RedefinirSenha />} />
                   <Route path="/verificar-email" element={<VerificarEmail />} />
+                  <Route path="/eventos/participar/:token" element={<AssociarEvento />} />
                   <Route path="/selecionar-tipo-conta" element={
                     <AuthGuard>
                       <SelecionarTipoConta />

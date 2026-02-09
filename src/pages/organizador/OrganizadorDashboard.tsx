@@ -31,7 +31,7 @@ const OrganizadorDashboard = () => {
     try {
       setLoading(true);
       const response = await dashboardApi.getInicio('organizador_evento');
-      setDashboardData(response.data);
+      setDashboardData(response.data.data || response.data);
     } catch (error: any) {
       console.error('Erro ao carregar dashboard:', error);
       toast({
