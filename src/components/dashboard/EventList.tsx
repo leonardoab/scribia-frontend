@@ -112,24 +112,26 @@ export function EventList({ eventos, onEdit, onDelete, loading }: EventListProps
                 <Presentation className="h-4 w-4 mr-2" />
                 Palestras
               </Button>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => onEdit(evento)}
-                >
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Editar
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => onDelete(evento.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {evento.is_owner !== false && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => onEdit(evento)}
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onDelete(evento.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

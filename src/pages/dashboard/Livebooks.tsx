@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Search, Filter, Download, Eye, Trash2, Calendar, FileText, Loader2, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -142,7 +143,7 @@ const Livebooks = () => {
 
   const handleDownloadPdf = async (livebook: any) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/livebooks/${livebook.id}/download/pdf`, {
+      const response = await fetch(`${getApiBaseUrl()}/livebooks/${livebook.id}/download/pdf`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -178,7 +179,7 @@ const Livebooks = () => {
 
   const handleDownloadTxt = async (livebook: any) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/livebooks/${livebook.id}/download/txt`, {
+      const response = await fetch(`${getApiBaseUrl()}/livebooks/${livebook.id}/download/txt`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },

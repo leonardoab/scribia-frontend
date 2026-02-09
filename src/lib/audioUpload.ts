@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import { supabase } from '@/integrations/supabase/client';
 
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
@@ -84,7 +85,7 @@ export async function uploadAudioToTranscribe(
   let realPalestraId = palestraId;
   try {
     console.log('🎬 Criando palestra...');
-    const createPalestraResponse = await fetch('http://localhost:3000/api/v1/palestras', {
+    const createPalestraResponse = await fetch(`${getApiBaseUrl()}/palestras`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ export async function uploadAudioToTranscribe(
   
   // Criar livebook mockado via API com URLs de documentos
   try {
-    const response = await fetch('http://localhost:3000/api/v1/livebooks', {
+    const response = await fetch(`${getApiBaseUrl()}/livebooks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +135,7 @@ export async function uploadAudioToTranscribe(
     
     // Atualizar livebook com URLs mockadas
     if (livebookId) {
-      await fetch(`http://localhost:3000/api/v1/livebooks/${livebookId}`, {
+      await fetch(`${getApiBaseUrl()}/livebooks/${livebookId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,7 +93,7 @@ export function EditPalestraDialog({
       }
 
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`http://localhost:3000/api/v1/palestras/${palestra.id}`, {
+      const response = await fetch(`${getApiBaseUrl()}/palestras/${palestra.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

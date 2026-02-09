@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ const PalestrasList = () => {
         return;
       }
 
-      const url = `http://localhost:3000/api/v1/eventos/${eventoId}/palestras`;
+      const url = `${getApiBaseUrl()}/eventos/${eventoId}/palestras`;
       console.log('URL:', url);
       
       const response = await fetch(url, {

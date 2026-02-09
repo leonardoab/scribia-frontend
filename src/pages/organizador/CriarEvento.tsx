@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
@@ -41,7 +42,7 @@ const CriarEvento = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/eventos', {
+      const response = await fetch(`${getApiBaseUrl()}/eventos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

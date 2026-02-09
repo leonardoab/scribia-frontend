@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -149,7 +150,7 @@ const PalestraForm = () => {
         throw new Error('Usuário não autenticado');
       }
 
-      const response = await fetch('http://localhost:3000/api/v1/palestras', {
+      const response = await fetch(`${getApiBaseUrl()}/palestras`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, FileText, Calendar, User } from 'lucide-react';
@@ -40,7 +41,7 @@ export default function LivebookView() {
 
   const handleDownload = async (formato: 'pdf' | 'txt') => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/livebooks/${id}/download/${formato}`, {
+      const response = await fetch(`${getApiBaseUrl()}/livebooks/${id}/download/${formato}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },

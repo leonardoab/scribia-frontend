@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/services/api';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -49,7 +50,7 @@ const GerarLivebook = () => {
       hasFetchedEventos.current = true;
       
       try {
-        const response = await fetch('http://localhost:3000/api/v1/eventos', {
+        const response = await fetch(`${getApiBaseUrl()}/eventos`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
           }
@@ -76,7 +77,7 @@ const GerarLivebook = () => {
     const fetchPalestras = async () => {
       if (!eventoId) return;
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/eventos/${eventoId}/palestras`, {
+        const response = await fetch(`${getApiBaseUrl()}/eventos/${eventoId}/palestras`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
           }
@@ -104,7 +105,7 @@ const GerarLivebook = () => {
         throw new Error('Por favor, preencha o título antes de continuar');
       }
       
-      const response = await fetch('http://localhost:3000/api/v1/palestras', {
+      const response = await fetch(`${getApiBaseUrl()}/palestras`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,7 +220,7 @@ const GerarLivebook = () => {
     setLivebookGerado('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/v1/livebooks', {
+      const response = await fetch(`${getApiBaseUrl()}/livebooks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
