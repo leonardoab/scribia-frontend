@@ -135,15 +135,15 @@ export function EventList({ eventos, onEdit, onDelete, loading }: EventListProps
                   onClick={() => navigate(`/dashboard/eventos/${evento.id}/palestras`)}
                 >
                   <Mic className="h-5 w-5 text-purple-600 mx-auto mb-1" />
-                  <p className="text-2xl font-bold text-purple-600">{evento.palestras || 0}</p>
+                  <p className="text-2xl font-bold text-purple-600">{Number(evento.total_palestras ?? evento.palestras ?? 0)}</p>
                   <p className="text-xs text-gray-600">Palestras</p>
                 </div>
                 <div 
                   className="text-center p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
-                  onClick={() => navigate(`/dashboard/livebooks`)}
+                  onClick={() => navigate(`/dashboard/livebooks?evento=${evento.id}`)}
                 >
                   <BookOpen className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-                  <p className="text-2xl font-bold text-blue-600">{evento.livebooks || 0}</p>
+                  <p className="text-2xl font-bold text-blue-600">{Number(evento.total_livebooks ?? evento.livebooks ?? 0)}</p>
                   <p className="text-xs text-gray-600">Livebooks</p>
                 </div>
               </div>

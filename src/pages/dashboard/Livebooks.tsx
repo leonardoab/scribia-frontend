@@ -1,7 +1,7 @@
 import { getApiBaseUrl } from '@/services/api';
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Search, Filter, Download, Eye, Trash2, Calendar, FileText, Loader2, XCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,6 +38,8 @@ interface Livebook {
 const Livebooks = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const eventoIdFilter = searchParams.get('evento');
   const { user, loading: authLoading } = useCustomAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'todos' | 'com-evento' | 'sem-evento'>('todos');
@@ -65,7 +67,6 @@ const Livebooks = () => {
         const backendData = response.data.data || response.data;
         const livebooksData = backendData.livebooks || [];
         
-        console.log('Livebooks recebidos:', livebooksData);
         setLivebooks(Array.isArray(livebooksData) ? livebooksData : []);
       } catch (err: any) {
         console.error('Erro ao buscar livebooks:', err);
@@ -98,6 +99,13 @@ const Livebooks = () => {
                          eventoNome.toLowerCase().includes(searchTerm.toLowerCase());
     
     const hasEvento = !!livebook.palestra?.evento;
+    
+    // Filtro por evento específico (da URL)
+    if (eventoIdFilter) {
+      const eventoId = livebook.palestra?.evento?.id;
+      const matchesEvento = eventoId === eventoIdFilter;
+      return matchesSearch && matchesEvento;
+    }
     const matchesFilter = filterType === 'todos' ||
                          (filterType === 'com-evento' && hasEvento) ||
                          (filterType === 'sem-evento' && !hasEvento);
@@ -365,25 +373,49 @@ const Livebooks = () => {
         <div className="flex gap-2">
           <Button
             variant={filterType === 'todos' ? 'default' : 'outline'}
-            onClick={() => setFilterType('todos')}
+            onClick={() => {
+              setFilterType('todos');
+              if (eventoIdFilter) {
+                navigate('/dashboard/livebooks');
+              }
+            }}
             size="sm"
           >
             Todos
           </Button>
           <Button
             variant={filterType === 'com-evento' ? 'default' : 'outline'}
-            onClick={() => setFilterType('com-evento')}
+            onClick={() => {
+              setFilterType('com-evento');
+              if (eventoIdFilter) {
+                navigate('/dashboard/livebooks');
+              }
+            }}
             size="sm"
           >
             Com evento
           </Button>
           <Button
             variant={filterType === 'sem-evento' ? 'default' : 'outline'}
-            onClick={() => setFilterType('sem-evento')}
+            onClick={() => {
+              setFilterType('sem-evento');
+              if (eventoIdFilter) {
+                navigate('/dashboard/livebooks');
+              }
+            }}
             size="sm"
           >
             Sem evento
           </Button>
+          {eventoIdFilter && (
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              Evento Filtrado
+            </Button>
+          )}
         </div>
       </div>
 

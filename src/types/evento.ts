@@ -11,6 +11,12 @@ export interface Evento {
   observacoes: string | null;
   criado_em: string;
   atualizado_em: string;
+  total_palestras?: number;
+  palestras?: number;
+  total_livebooks?: number;
+  livebooks?: number;
+  participantes_unicos?: number;
+  is_owner?: boolean;
 }
 
 export interface EventoFormData {
