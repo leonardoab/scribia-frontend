@@ -14,6 +14,7 @@ export interface Palestra {
   slides_url: string | null;
   criado_em: string;
   atualizado_em: string;
+  total_livebooks?: number;
 }
 
 export interface PalestraFormData {

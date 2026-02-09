@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Pencil, Trash2, Eye, ArrowLeft } from "lucide-react";
+import { PlusCircle, Pencil, Trash2, Eye, ArrowLeft, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -274,85 +274,55 @@ const PalestrasList = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {palestras.map((palestra) => (
-              <Card key={palestra.id} className="hover:shadow-lg transition-shadow flex flex-col h-full min-h-[420px]">
-                <CardHeader className="pb-3">
+              <Card key={palestra.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-lg line-clamp-2">{palestra.titulo}</CardTitle>
+                      <CardTitle className="text-xl mb-2">{palestra.titulo}</CardTitle>
                       {palestra.palestrante && (
-                        <CardDescription className="mt-1 line-clamp-1">
-                          {palestra.palestrante}
-                        </CardDescription>
+                        <p className="text-sm text-muted-foreground">{palestra.palestrante}</p>
                       )}
                     </div>
+                    {getStatusBadge(palestra.status)}
                   </div>
                 </CardHeader>
-                <CardContent className="flex flex-col flex-1 gap-4">
-                  <div className="space-y-3 flex-1">
-                    {/* Status Badge */}
-                    <div className="flex items-center justify-start">
-                      {getStatusBadge(palestra.status)}
-                    </div>
-
-                    {/* Customização */}
-                    {getCustomizacaoText(palestra.nivel_escolhido, palestra.formato_escolhido) && (
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        {getCustomizacaoText(palestra.nivel_escolhido, palestra.formato_escolhido)}
-                      </div>
-                    )}
-
-                    {palestra.tags_tema && palestra.tags_tema.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {palestra.tags_tema.slice(0, 3).map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {palestra.tags_tema.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{palestra.tags_tema.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Data de criação */}
-                    <div className="text-xs text-muted-foreground pt-2">
-                      Criada em {new Date(palestra.criado_em).toLocaleDateString('pt-BR')} às{' '}
-                      {new Date(palestra.criado_em).toLocaleTimeString('pt-BR', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-4 mb-6">
+                    <div 
+                      className="text-center p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
+                      onClick={() => navigate(`/dashboard/livebooks?palestra=${palestra.id}`)}
+                    >
+                      <BookOpen className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-blue-600">{Number(palestra.total_livebooks ?? 0)}</p>
+                      <p className="text-xs text-gray-600">Livebooks</p>
                     </div>
                   </div>
-
-                  <div className="border-t pt-3" />
-
-                  {/* Botões fixos no final */}
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => navigate(`/dashboard/eventos/${eventoId}/palestras/${palestra.id}`)}
-                      title="Ver detalhes"
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"
+                      onClick={() => navigate(`/dashboard/livebooks?palestra=${palestra.id}`)}
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4 mr-2" />
+                      Ver Detalhes
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
                       onClick={() => handleEditClick(palestra)}
-                      title="Editar"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Editar
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-red-200 text-red-700 hover:bg-red-50"
                       onClick={() => handleDeleteClick(palestra.id)}
-                      title="Excluir"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

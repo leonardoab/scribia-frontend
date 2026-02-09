@@ -40,6 +40,7 @@ const Livebooks = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const eventoIdFilter = searchParams.get('evento');
+  const palestraIdFilter = searchParams.get('palestra');
   const { user, loading: authLoading } = useCustomAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'todos' | 'com-evento' | 'sem-evento'>('todos');
@@ -99,6 +100,12 @@ const Livebooks = () => {
                          eventoNome.toLowerCase().includes(searchTerm.toLowerCase());
     
     const hasEvento = !!livebook.palestra?.evento;
+    
+    // Filtro por palestra específica (da URL)
+    if (palestraIdFilter) {
+      const palestraId = livebook.palestra?.id;
+      return matchesSearch && palestraId === palestraIdFilter;
+    }
     
     // Filtro por evento específico (da URL)
     if (eventoIdFilter) {
@@ -334,7 +341,12 @@ const Livebooks = () => {
         <p className="text-muted-foreground mb-6">
           Crie seu primeiro Livebook agora mesmo!
         </p>
-        <Button onClick={() => navigate('/dashboard/gerar-livebook')} size="lg">
+        <Button onClick={() => {
+          const url = palestraIdFilter 
+            ? `/dashboard/gerar-livebook?palestra=${palestraIdFilter}`
+            : '/dashboard/gerar-livebook';
+          navigate(url);
+        }} size="lg">
           <BookOpen className="h-5 w-5 mr-2" />
           Criar Livebook
         </Button>
@@ -350,7 +362,12 @@ const Livebooks = () => {
           <h1 className="text-3xl font-bold">Meus Livebooks</h1>
           <p className="text-muted-foreground mt-1">Todos os seus materiais de estudo personalizados</p>
         </div>
-        <Button onClick={() => navigate('/dashboard/gerar-livebook')} size="lg">
+        <Button onClick={() => {
+          const url = palestraIdFilter 
+            ? `/dashboard/gerar-livebook?palestra=${palestraIdFilter}`
+            : '/dashboard/gerar-livebook';
+          navigate(url);
+        }} size="lg">
           <BookOpen className="h-5 w-5 mr-2" />
           Criar Livebook
         </Button>
@@ -372,10 +389,10 @@ const Livebooks = () => {
         {/* Filtros */}
         <div className="flex gap-2">
           <Button
-            variant={filterType === 'todos' ? 'default' : 'outline'}
+            variant={filterType === 'todos' && !eventoIdFilter && !palestraIdFilter ? 'default' : 'outline'}
             onClick={() => {
               setFilterType('todos');
-              if (eventoIdFilter) {
+              if (eventoIdFilter || palestraIdFilter) {
                 navigate('/dashboard/livebooks');
               }
             }}
@@ -384,10 +401,10 @@ const Livebooks = () => {
             Todos
           </Button>
           <Button
-            variant={filterType === 'com-evento' ? 'default' : 'outline'}
+            variant={filterType === 'com-evento' && !eventoIdFilter && !palestraIdFilter ? 'default' : 'outline'}
             onClick={() => {
               setFilterType('com-evento');
-              if (eventoIdFilter) {
+              if (eventoIdFilter || palestraIdFilter) {
                 navigate('/dashboard/livebooks');
               }
             }}
@@ -396,10 +413,10 @@ const Livebooks = () => {
             Com evento
           </Button>
           <Button
-            variant={filterType === 'sem-evento' ? 'default' : 'outline'}
+            variant={filterType === 'sem-evento' && !eventoIdFilter && !palestraIdFilter ? 'default' : 'outline'}
             onClick={() => {
               setFilterType('sem-evento');
-              if (eventoIdFilter) {
+              if (eventoIdFilter || palestraIdFilter) {
                 navigate('/dashboard/livebooks');
               }
             }}
@@ -407,6 +424,15 @@ const Livebooks = () => {
           >
             Sem evento
           </Button>
+          {palestraIdFilter && (
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Palestra Filtrada
+            </Button>
+          )}
           {eventoIdFilter && (
             <Button
               variant="default"

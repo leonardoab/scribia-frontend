@@ -1,5 +1,6 @@
 import { getApiBaseUrl } from '@/services/api';
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,7 @@ import autoTable from 'jspdf-autotable';
 
 const GerarLivebook = () => {
   const { user } = useCustomAuth();
+  const [searchParams] = useSearchParams();
   const [transcricao, setTranscricao] = useState('');
   const [titulo, setTitulo] = useState('');
   const [palestrante, setPalestrante] = useState('');
@@ -71,6 +73,51 @@ const GerarLivebook = () => {
       fetchEventos();
     }
   }, [relacionarEvento, user?.profile?.id]);
+
+  // Pré-selecionar palestra da URL
+  React.useEffect(() => {
+    const palestraIdFromUrl = searchParams.get('palestra');
+    if (palestraIdFromUrl) {
+      setRelacionarEvento(true);
+      setPalestraSelecionada(palestraIdFromUrl);
+      
+      // Buscar todos os eventos para encontrar o evento da palestra
+      const findEventoFromPalestra = async () => {
+        try {
+          const response = await fetch(`${getApiBaseUrl()}/eventos`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const eventosArray = data.data?.eventos || data.eventos || [];
+            
+            // Buscar em cada evento até encontrar a palestra
+            for (const evento of eventosArray) {
+              const palestraResponse = await fetch(`${getApiBaseUrl()}/eventos/${evento.id}/palestras`, {
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                }
+              });
+              if (palestraResponse.ok) {
+                const palestraData = await palestraResponse.json();
+                const palestrasArray = palestraData.data?.palestras || palestraData.data || palestraData || [];
+                const palestraEncontrada = palestrasArray.find((p: any) => p.id === palestraIdFromUrl);
+                if (palestraEncontrada) {
+                  setEventoId(evento.id);
+                  break;
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Erro ao buscar evento da palestra:', error);
+        }
+      };
+      findEventoFromPalestra();
+    }
+  }, [searchParams]);
 
   // Buscar palestras do evento selecionado
   React.useEffect(() => {
