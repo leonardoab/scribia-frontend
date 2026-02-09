@@ -143,6 +143,8 @@ const GerarLivebook = () => {
 
   // Criar palestra temporária para upload de áudio
   const criarPalestra = async () => {
+    console.error('⚠️ ATENÇÃO: criarPalestra foi chamada indevidamente!');
+    console.trace('Stack trace:');
     try {
       if (!user?.profile?.id) {
         throw new Error('Usuário não autenticado');
@@ -651,8 +653,25 @@ const GerarLivebook = () => {
       return;
     }
 
+    if (relacionarEvento && (!eventoId || !palestraSelecionada)) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione um evento e uma palestra",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setPreparingUpload(true);
-    await criarPalestra();
+    
+    // Se houver relacionamento com evento, usa a palestra selecionada
+    if (relacionarEvento && palestraSelecionada) {
+      setPalestraId(palestraSelecionada);
+    } else {
+      // Sem evento: permite upload sem palestra
+      setPalestraId(null);
+    }
+    
     setPreparingUpload(false);
   };
 

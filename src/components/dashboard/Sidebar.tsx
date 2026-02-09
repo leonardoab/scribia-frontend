@@ -27,8 +27,8 @@ const Sidebar = ({ className, onNavigate }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: 'Início', path: '/dashboard' },
     { icon: Calendar, label: 'Meus Eventos', path: '/dashboard/eventos' },
-    { icon: BookOpen, label: 'Gerar Livebook', path: '/dashboard/gerar-livebook' },
     { icon: BookOpen, label: 'Meus Livebooks', path: '/dashboard/livebooks' },
+    { icon: BookOpen, label: 'Gerar Livebook', path: '/dashboard/gerar-livebook' },
     { icon: FileText, label: 'Tutor ScribIA', path: '/dashboard/tutor' },
     { icon: HelpCircle, label: 'Ajuda / Suporte', path: '/dashboard/ajuda' },
   ];

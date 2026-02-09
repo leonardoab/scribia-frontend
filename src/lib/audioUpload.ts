@@ -52,56 +52,14 @@ export async function uploadAudioToTranscribe(
   await new Promise(resolve => setTimeout(resolve, 1000));
   if (onProgress) onProgress(80);
   
-  // Criar livebook mockado via API com URLs de documentos
-  try {
-    const response = await fetch(`${getApiBaseUrl()}/livebooks`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-      },
-      body: JSON.stringify({
-        ...(palestraId && { palestra_id: palestraId }),
-        titulo: file.name.replace(/\.[^/.]+$/, ''),
-        tipo_resumo: 'completo',
-        status: 'concluido',
-      }),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Erro ao criar livebook');
-    }
-    
-    const result = await response.json();
-    const livebookId = result.data?.id || result.id;
-    
-    // Atualizar livebook com URLs mockadas
-    if (livebookId) {
-      await fetch(`${getApiBaseUrl()}/livebooks/${livebookId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify({
-          pdf_url: `https://example.com/livebooks/${livebookId}.pdf`,
-          docx_url: `https://example.com/livebooks/${livebookId}.docx`,
-          html_url: `https://example.com/livebooks/${livebookId}.html`,
-        }),
-      });
-    }
-    
-    console.log('✅ Livebook criado com sucesso (mock)');
-  } catch (error) {
-    console.error('❌ Erro ao criar livebook:', error);
-    throw error;
-  }
-
+  // Retornar transcrição mockada
+  const transcricaoMock = `Transcrição simulada do arquivo: ${file.name}\n\nEste é um conteúdo de exemplo gerado automaticamente.`;
+  
   if (onProgress) onProgress(100);
-  console.log('✅ Transcrição iniciada com sucesso');
+  console.log('✅ Transcrição concluída');
 
   return {
     success: true,
-    message: 'Transcrição concluída (mock)',
+    message: transcricaoMock,
   };
 }
