@@ -153,7 +153,7 @@ const Livebooks = () => {
   };
 
   const handleView = (livebookId: string) => {
-    navigate(`/dashboard/livebooks/${livebookId}`);
+    navigate(`/organizador/livebooks/${livebookId}`);
   };
 
   const handleDownloadPdf = async (livebook: any) => {
@@ -528,7 +528,7 @@ const Livebooks = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigate(`/dashboard/livebooks/${livebook.id}`)}
+                    onClick={() => navigate(`/organizador/livebooks/${livebook.id}`)}
                   >
                     <Eye className="h-3 w-3 mr-1" />
                     Ver

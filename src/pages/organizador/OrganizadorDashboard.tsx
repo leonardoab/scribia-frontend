@@ -91,16 +91,22 @@ const OrganizadorDashboard = () => {
     },
     { 
       title: 'Downloads Realizados', 
-      value: String(dashboardData.estatisticas?.total_livebooks || 0),
+      value: String(dashboardData.estatisticas?.total_downloads || 0),
       icon: Download, 
       change: 'Total de downloads',
       color: 'from-cyan-500 to-cyan-600'
     },
     { 
       title: 'Taxa de Engajamento', 
-      value: '87%', 
+      value: (() => {
+        const downloads = dashboardData.estatisticas?.total_downloads || 0;
+        const participantes = dashboardData.estatisticas?.total_participantes || 0;
+        if (participantes === 0) return '0%';
+        const taxa = Math.round((downloads / participantes) * 100);
+        return `${Math.min(taxa, 100)}%`;
+      })(),
       icon: TrendingUp, 
-      change: 'Acima da média',
+      change: 'Downloads por participante',
       color: 'from-emerald-500 to-emerald-600'
     }
   ];

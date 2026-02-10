@@ -105,10 +105,6 @@ const PalestrasLivebooks = () => {
           <h1 className="text-2xl font-bold text-gray-900">Palestras e Livebooks</h1>
           <p className="text-gray-600">Acompanhe o desempenho do conteúdo dos seus eventos</p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Palestra
-        </Button>
       </div>
 
       {/* Estatísticas */}

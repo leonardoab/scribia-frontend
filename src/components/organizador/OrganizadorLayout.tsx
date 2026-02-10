@@ -22,6 +22,7 @@ import GerarLivebook from '@/pages/organizador/GerarLivebook';
 import Livebooks from '@/pages/organizador/Livebooks';
 import PalestrasList from '@/pages/organizador/PalestrasList';
 import PalestraForm from '@/pages/organizador/PalestraForm';
+import LivebookView from '@/pages/organizador/LivebookView';
 
 const OrganizadorLayout = () => {
   const [isTutorOpen, setIsTutorOpen] = useState(false);
@@ -79,6 +80,7 @@ const OrganizadorLayout = () => {
             <Route path="eventos/:eventoId/palestras/nova" element={<PalestraForm />} />
             <Route path="criar-evento" element={<CriarEvento />} />
             <Route path="livebooks" element={<Livebooks />} />
+            <Route path="livebooks/:id" element={<LivebookView />} />
             <Route path="gerar-livebook" element={<GerarLivebook />} />
             <Route path="participantes" element={<Participantes />} />
             <Route path="palestras-livebooks" element={<PalestrasLivebooks />} />
