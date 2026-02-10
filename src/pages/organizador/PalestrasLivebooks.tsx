@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { livebooksApi, eventosApi } from '@/services/api';
+import { livebooksApi, eventosApi, palestrasApi } from '@/services/api';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +27,7 @@ interface Palestra {
   palestrante: string;
   evento_nome: string;
   livebooks_gerados: number;
+  total_acessos: number;
   data_palestra: string;
   tags_tema: string[];
 }
@@ -50,39 +51,16 @@ const PalestrasLivebooks = () => {
     try {
       setLoading(true);
 
-      const [livebooksRes, eventosRes] = await Promise.all([
-        livebooksApi.list(),
+      const [palestrasRes, eventosRes] = await Promise.all([
+        palestrasApi.list(),
         eventosApi.list()
       ]);
 
-      const livebooksData = livebooksRes.data || [];
+      const palestrasData = palestrasRes.data?.data || palestrasRes.data || [];
       const eventosData = eventosRes.data?.data?.eventos || eventosRes.data?.eventos || eventosRes.data || [];
 
       setEventos(Array.isArray(eventosData) ? eventosData.map((e: any) => ({ id: e.id, nome: e.nome_evento })) : []);
-
-      // Agrupar livebooks por palestra
-      const palestrasMap = new Map<string, Palestra>();
-      
-      (Array.isArray(livebooksData) ? livebooksData : []).forEach((livebook: any) => {
-        const palestraId = livebook.palestra_id;
-        
-        if (!palestrasMap.has(palestraId)) {
-          palestrasMap.set(palestraId, {
-            id: palestraId,
-            titulo: livebook.titulo_palestra || 'Sem título',
-            palestrante: livebook.palestrante || 'Não informado',
-            evento_nome: livebook.evento_nome || 'Sem evento',
-            livebooks_gerados: 0,
-            data_palestra: livebook.criado_em,
-            tags_tema: livebook.tags_tema || [],
-          });
-        }
-        
-        const palestra = palestrasMap.get(palestraId)!;
-        palestra.livebooks_gerados++;
-      });
-
-      setPalestras(Array.from(palestrasMap.values()));
+      setPalestras(Array.isArray(palestrasData) ? palestrasData : []);
     } catch (error: any) {
       console.error('Erro ao buscar dados:', error);
       toast({
@@ -107,7 +85,7 @@ const PalestrasLivebooks = () => {
   const mediaPorPalestra = totalPalestras > 0 ? Math.round(totalLivebooks / totalPalestras) : 0;
 
   const topPalestras = [...palestras]
-    .sort((a, b) => b.livebooks_gerados - a.livebooks_gerados)
+    .sort((a, b) => (b.total_acessos || 0) - (a.total_acessos || 0))
     .slice(0, 3);
 
   if (loading) {
@@ -177,7 +155,7 @@ const PalestrasLivebooks = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{topPalestras[0]?.livebooks_gerados || 0}</div>
+            <div className="text-2xl font-bold text-orange-600">{topPalestras[0]?.total_acessos || 0}</div>
             <p className="text-xs text-muted-foreground truncate">
               {topPalestras[0]?.titulo.substring(0, 30) || 'N/A'}...
             </p>
@@ -210,8 +188,8 @@ const PalestrasLivebooks = () => {
                     <p className="text-sm text-gray-600">por {palestra.palestrante}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-purple-600">{palestra.livebooks_gerados}</div>
-                    <p className="text-xs text-gray-500">Livebooks</p>
+                    <div className="text-lg font-bold text-purple-600">{palestra.total_acessos || 0}</div>
+                    <p className="text-xs text-gray-500">Acessos</p>
                   </div>
                 </div>
               ))}

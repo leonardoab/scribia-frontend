@@ -64,6 +64,7 @@ export const eventosApi = {
 
 // Palestras
 export const palestrasApi = {
+  list: () => api.get('/palestras'),
   create: (data: any) => api.post('/palestras', data),
   get: (id: string) => api.get(`/palestras/${id}`),
   getStatus: (id: string) => api.get(`/palestras/${id}/status`),
