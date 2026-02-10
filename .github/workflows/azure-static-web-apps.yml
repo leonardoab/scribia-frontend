@@ -34,6 +34,7 @@ jobs:
         env:
           NODE_ENV: production
           CI: false
+          VITE_API_URL: https://scribiabackend-fmedhyfpfqgdgchu.brazilsouth-01.azurewebsites.net/api/v1
       
       - name: Build And Deploy
         id: builddeploy
