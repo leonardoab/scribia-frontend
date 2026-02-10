@@ -1,3 +1,7 @@
+# SSL certificates
+localhost-key.pem
+localhost-cert.pem
+
 # Logs
 logs
 *.log
