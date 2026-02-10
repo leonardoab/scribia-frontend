@@ -1,0 +1,371 @@
+import { getApiBaseUrl } from '@/services/api';
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { PlusCircle, Pencil, Trash2, Eye, ArrowLeft, BookOpen } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { Palestra } from "@/types/palestra";
+import { EditPalestraDialog } from "@/components/palestras/EditPalestraDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+const PalestrasList = () => {
+  const { eventoId } = useParams<{ eventoId: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const [palestras, setPalestras] = useState<Palestra[]>([]);
+  const [livebookStatuses, setLivebookStatuses] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [palestraToDelete, setPalestraToDelete] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [palestraToEdit, setPalestraToEdit] = useState<Palestra | null>(null);
+  const [nomeEvento, setNomeEvento] = useState("");
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (eventoId && !hasFetched.current) {
+      hasFetched.current = true;
+      fetchEvento();
+      fetchPalestras();
+    }
+  }, [eventoId]);
+
+  const fetchEvento = async () => {
+    try {
+      const userId = localStorage.getItem('scribia_user_id');
+      if (!userId) return;
+
+      const { data, error } = await supabase.rpc('scribia_get_eventos' as any, {
+        p_usuario_id: userId
+      });
+
+      if (error) throw error;
+      
+      if ((data as any)?.success) {
+        const eventos = (data as any).eventos;
+        const evento = eventos.find((e: any) => e.id === eventoId);
+        setNomeEvento(evento?.nome || '');
+      }
+    } catch (error: any) {
+      console.error("Erro ao buscar evento:", error);
+    }
+  };
+
+  const fetchPalestras = async () => {
+    try {
+      console.log('Buscando palestras do evento:', eventoId);
+      setLoading(true);
+      const token = localStorage.getItem('auth_token');
+      console.log('Token:', token ? 'existe' : 'não existe');
+      
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const url = `${getApiBaseUrl()}/eventos/${eventoId}/palestras`;
+      console.log('URL:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar palestras');
+      }
+
+      const palestrasData = await response.json();
+      console.log('Palestras recebidas:', palestrasData);
+      setPalestras(palestrasData.data || []);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar palestras",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLivebookStatuses = async (palestrasData: Palestra[], userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('scribia_get_livebooks' as any, {
+        p_usuario_id: userId,
+        p_evento_id: eventoId,
+      });
+
+      if (error) throw error;
+      
+      if ((data as any)?.success) {
+        const livebooks = (data as any).livebooks || [];
+        const statusMap: Record<string, string> = {};
+        
+        livebooks.forEach((lb: any) => {
+          if (lb.palestra?.id) {
+            statusMap[lb.palestra.id] = lb.status;
+          }
+        });
+        
+        setLivebookStatuses(statusMap);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar status dos livebooks:', error);
+    }
+  };
+
+  const handleEditClick = (palestra: Palestra) => {
+    setPalestraToEdit(palestra);
+    setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setPalestraToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!palestraToDelete) return;
+
+    try {
+      const userId = localStorage.getItem('scribia_user_id');
+      if (!userId) {
+        navigate('/login');
+        return;
+      }
+
+      const { data, error } = await supabase.rpc('scribia_delete_palestra' as any, {
+        p_palestra_id: palestraToDelete,
+        p_usuario_id: userId,
+      });
+
+      if (error) throw error;
+      
+      if (!(data as any)?.success) {
+        throw new Error((data as any)?.error || 'Erro ao excluir palestra');
+      }
+
+      toast({
+        title: "🗑️ Palestra excluída com sucesso!",
+      });
+
+      fetchPalestras();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao excluir palestra",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setPalestraToDelete(null);
+    }
+  };
+
+  const getStatusBadge = (status: Palestra['status']) => {
+    const variants: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" }> = {
+      planejada: { label: "Planejada", variant: "outline" },
+      em_andamento: { label: "Em Andamento", variant: "secondary" },
+      concluida: { label: "Concluída", variant: "success" },
+      cancelada: { label: "Cancelada", variant: "destructive" },
+    };
+    const config = variants[status] || { label: status || "Desconhecido", variant: "default" };
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
+  const getCustomizacaoText = (nivel: string | null, formato: string | null) => {
+    if (!nivel && !formato) return null;
+    
+    const nivelLabels: Record<string, string> = {
+      junior: "Júnior",
+      pleno: "Pleno",
+      senior: "Sênior",
+    };
+    
+    const formatoLabels: Record<string, string> = {
+      completo: "Completo",
+      compacto: "Compacto",
+    };
+    
+    const nivelText = nivel ? nivelLabels[nivel] || nivel : '';
+    const formatoText = formato ? formatoLabels[formato] || formato : '';
+    
+    return [nivelText, formatoText].filter(Boolean).join(' ');
+  };
+
+  return (
+    <div className="p-4 sm:p-6 py-6 space-y-6 w-full">
+        {/* Header */}
+        <div className="flex flex-col gap-4">
+          {eventoId && (
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/organizador/eventos")}
+              className="w-fit"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar para Eventos
+            </Button>
+          )}
+
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">
+                {eventoId ? `Palestras - ${nomeEvento}` : 'Minhas Palestras'}
+              </h2>
+              <p className="text-muted-foreground mt-1">
+                Gerencie as palestras deste evento
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate(`/organizador/eventos/${eventoId}/palestras/nova`)}
+              size="lg"
+            >
+              <PlusCircle className="mr-2 h-5 w-5" />
+              Nova Palestra
+            </Button>
+          </div>
+        </div>
+
+        {/* Lista de Palestras */}
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader>
+                  <div className="h-6 bg-muted rounded w-3/4"></div>
+                  <div className="h-4 bg-muted rounded w-1/2 mt-2"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-4 bg-muted rounded w-full"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : palestras.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-muted-foreground mb-4">
+                Nenhuma palestra cadastrada ainda.
+              </p>
+              <Button onClick={() => navigate(`/organizador/eventos/${eventoId}/palestras/nova`)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Criar Primeira Palestra
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {palestras.map((palestra) => (
+              <Card key={palestra.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-2">{palestra.titulo}</CardTitle>
+                      {palestra.palestrante && (
+                        <p className="text-sm text-muted-foreground">{palestra.palestrante}</p>
+                      )}
+                    </div>
+                    {getStatusBadge(palestra.status)}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-4 mb-6">
+                    <div 
+                      className="text-center p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
+                      onClick={() => navigate(`/organizador/livebooks?palestra=${palestra.id}`)}
+                    >
+                      <BookOpen className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-blue-600">{Number(palestra.total_livebooks ?? 0)}</p>
+                      <p className="text-xs text-gray-600">Livebooks</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50"
+                      onClick={() => navigate(`/organizador/livebooks?palestra=${palestra.id}`)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Ver Detalhes
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                      onClick={() => handleEditClick(palestra)}
+                    >
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Editar
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-red-200 text-red-700 hover:bg-red-50"
+                      onClick={() => handleDeleteClick(palestra.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Edit Dialog */}
+        {palestraToEdit && (
+          <EditPalestraDialog
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            palestra={palestraToEdit}
+            onSuccess={fetchPalestras}
+            livebookStatus={livebookStatuses[palestraToEdit.id] || null}
+          />
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. A palestra será permanentemente excluída.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default PalestrasList;

@@ -360,7 +360,10 @@ const MeusEventos = () => {
                     <p className="text-2xl font-bold text-purple-600">{evento.livebooks}</p>
                     <p className="text-xs text-gray-600">Livebooks</p>
                   </div>
-                  <div className="text-center p-3 bg-indigo-50 rounded-lg">
+                  <div 
+                    className="text-center p-3 bg-indigo-50 rounded-lg cursor-pointer hover:bg-indigo-100 transition-colors"
+                    onClick={() => navigate(`/organizador/eventos/${evento.id}/palestras`)}
+                  >
                     <Mic className="h-5 w-5 text-indigo-600 mx-auto mb-1" />
                     <p className="text-2xl font-bold text-indigo-600">{evento.palestras}</p>
                     <p className="text-xs text-gray-600">Palestras</p>

@@ -18,6 +18,10 @@ import PalestrasLivebooks from '@/pages/organizador/PalestrasLivebooks';
 import RankingsTendencias from '@/pages/organizador/RankingsTendencias';
 import RelatoriosExecutivos from '@/pages/organizador/RelatoriosExecutivos';
 import ConfiguracoesOrganizador from '@/pages/organizador/ConfiguracoesOrganizador';
+import GerarLivebook from '@/pages/organizador/GerarLivebook';
+import Livebooks from '@/pages/organizador/Livebooks';
+import PalestrasList from '@/pages/organizador/PalestrasList';
+import PalestraForm from '@/pages/organizador/PalestraForm';
 
 const OrganizadorLayout = () => {
   const [isTutorOpen, setIsTutorOpen] = useState(false);
@@ -71,7 +75,11 @@ const OrganizadorLayout = () => {
             <Route index element={<OrganizadorDashboard />} />
             <Route path="dashboard" element={<OrganizadorDashboard />} />
             <Route path="eventos" element={<MeusEventos />} />
+            <Route path="eventos/:eventoId/palestras" element={<PalestrasList />} />
+            <Route path="eventos/:eventoId/palestras/nova" element={<PalestraForm />} />
             <Route path="criar-evento" element={<CriarEvento />} />
+            <Route path="livebooks" element={<Livebooks />} />
+            <Route path="gerar-livebook" element={<GerarLivebook />} />
             <Route path="participantes" element={<Participantes />} />
             <Route path="palestras-livebooks" element={<PalestrasLivebooks />} />
             <Route path="rankings" element={<RankingsTendencias />} />

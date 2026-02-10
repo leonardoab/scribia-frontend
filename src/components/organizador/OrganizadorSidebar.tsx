@@ -7,7 +7,8 @@ import {
   FileText, 
   TrendingUp, 
   BarChart3, 
-  Settings, 
+  Settings,
+  BookOpen, 
   HelpCircle, 
   LogOut,
   Brain,
@@ -38,6 +39,12 @@ const OrganizadorSidebar = ({ className, onNavigate }: OrganizadorSidebarProps) 
       icon: Calendar, 
       label: 'Meus Eventos',
       description: 'Gerenciar eventos'
+    },
+    { 
+      path: '/organizador/livebooks', 
+      icon: BookOpen, 
+      label: 'Meus Livebooks',
+      description: 'Materiais de estudo'
     },
     { 
       path: '/organizador/participantes', 
