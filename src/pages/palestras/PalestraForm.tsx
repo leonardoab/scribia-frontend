@@ -136,10 +136,8 @@ const PalestraForm = () => {
         description: 'Redirecionando para a lista de palestras...'
       });
       
-      setTimeout(() => {
-        console.log('Navegando para:', `/dashboard/eventos/${eventoId}/palestras`);
-        navigate(`/dashboard/eventos/${eventoId}/palestras`);
-      }, 1000);
+      console.log('Navegando para:', `/dashboard/eventos/${eventoId}/palestras`);
+      navigate(`/dashboard/eventos/${eventoId}/palestras`);
     }
   };
 

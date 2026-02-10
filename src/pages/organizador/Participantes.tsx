@@ -50,7 +50,7 @@ const Participantes = () => {
         eventosApi.list()
       ]);
 
-      const participantesData = participantesRes.data || [];
+      const participantesData = participantesRes.data?.data?.participantes || participantesRes.data?.participantes || [];
       const eventosData = eventosRes.data?.data?.eventos || eventosRes.data?.eventos || eventosRes.data || [];
 
       setEventos(Array.isArray(eventosData) ? eventosData.map((e: any) => ({ id: e.id, nome: e.nome_evento })) : []);

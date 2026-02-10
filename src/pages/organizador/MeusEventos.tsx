@@ -355,7 +355,10 @@ const MeusEventos = () => {
                     <p className="text-2xl font-bold text-blue-600">{evento.participantes}</p>
                     <p className="text-xs text-gray-600">Participantes</p>
                   </div>
-                  <div className="text-center p-3 bg-purple-50 rounded-lg">
+                  <div 
+                    className="text-center p-3 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors"
+                    onClick={() => navigate(`/organizador/livebooks?evento=${evento.id}`)}
+                  >
                     <BookOpen className="h-5 w-5 text-purple-600 mx-auto mb-1" />
                     <p className="text-2xl font-bold text-purple-600">{evento.livebooks}</p>
                     <p className="text-xs text-gray-600">Livebooks</p>

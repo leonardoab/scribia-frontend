@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from '@/services/api';
 import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const GerarLivebook = () => {
+  const navigate = useNavigate();
   const { user } = useCustomAuth();
   const [searchParams] = useSearchParams();
   const [transcricao, setTranscricao] = useState('');
@@ -283,17 +284,11 @@ const GerarLivebook = () => {
 
       toast({
         title: "Livebook gerado e salvo com sucesso! ✅",
-        description: "Seu Livebook está disponível em 'Meus Livebooks'"
+        description: "Redirecionando para Meus Livebooks..."
       });
 
-      // Limpar formulário
-      setTranscricao('');
-      setTitulo('');
-      setPalestrante('');
-      setPalestraId(null);
-      setRelacionarEvento(false);
-      setEventoId('');
-      setPalestraSelecionada('');
+      // Redirecionar para Meus Livebooks
+      navigate('/organizador/livebooks');
 
     } catch (error: any) {
       console.error('Erro ao gerar Livebook:', error);
